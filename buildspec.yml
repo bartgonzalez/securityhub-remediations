@@ -18,8 +18,8 @@ phases:
     commands:
       - echo Entered the pre_build phase...
       - aws --version
-      - uname -a
-      - aws codebuild batch-get-projects --names "SecurityHubRemediationsWorkshop-Master" --query projects[*].[name,arn,environment.image]
+      # - uname -a
+      # - aws codebuild batch-get-projects --names "SecurityHubRemediationsWorkshop-Master" --query projects[*].[name,arn,environment.image]
       - env | grep CODEBUILD
     finally:
       - echo This always runs even if the login command fails 
@@ -27,9 +27,15 @@ phases:
     commands:
       - echo Entered the build phase...
       - echo Build started on `date`
-      - aws cloudformation create-stack --template-body file://module1/securityhub-remediations-workshop.yml --stack-name $STACKNAME  --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=VpcId,ParameterValue=vpc-d6fe6cb1  --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild
-      - aws cloudformation wait stack-create-complete --stack-name $STACKNAME --no-paginate 
-      - # aws cloudformation delete-stack --stack-name $STACKNAME
+      - aws cloudformation create-stack --template-body file://module1/securityhub-remediations-workshop.yml --stack-name $STACKNAME  \
+             --capabilities CAPABILITY_NAMED_IAM \
+             --parameters ParameterKey=VpcId,ParameterValue=vpc-d6fe6cb1  \
+                          ParameterKey=Cloud9OwnerArn,ParameterValue=arn:aws:sts::369510138361:assumed-role/TeamRole/filiatra-Isengard
+             --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild
+      # --parameters ParameterKey=EnableGuardDuty,ParameterValue=False ParameterKey=EnableSecurityHub,ParameterValue=False
+      - aws cloudformation wait stack-create-complete --stack-name $STACKNAME
+      - aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $(aws ec2 describe-instances --filters Name=tag:Name,Values="aws-cloud9-SecurityHubWorkshop*" Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text) 
+      # - aws cloudformation delete-stack --stack-name $STACKNAME
     finally:
       - echo This always runs even if the install command fails
   post_build:
