@@ -18,7 +18,7 @@ phases:
     commands:
       - echo Entered the build phase...
       - echo Build started on `date`
-     aws cloudformation validate-template --template-body file://module1/securityhub-remediations-workshop.yml
+      - aws cloudformation validate-template --template-body file://module1/securityhub-remediations-workshop.yml
       # - mvn install
     finally:
       - echo This always runs even if the install command fails
