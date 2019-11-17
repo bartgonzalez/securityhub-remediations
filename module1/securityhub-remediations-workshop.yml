@@ -242,6 +242,9 @@ Resources:
         - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
         - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         - Ref: "CliHostPolicy"
+        - "arn:aws:iam::aws:policy/SecurityAudit"
+        - Ref: "CloudCustodianLambdaDeploymentManagedPolicy"
+        - Ref: "CloudCustodianPolicyActions"
         
   CliInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
