@@ -2,10 +2,13 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      python: 3.7
+      # docker 18
     commands:
       - echo Entered the install phase...
-      - yum update
-      - yum upgrade
+      - yum update -y
+      - yum upgrade -y
     finally:
       - echo This always runs even if the update or install command fails 
   pre_build:
