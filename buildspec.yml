@@ -7,7 +7,7 @@ phases:
   install:
     runtime-versions:
       # python: 3.7
-      # docker 18
+      docker 18
     commands:
       - echo Entered the install phase...
       # - yum update -y
