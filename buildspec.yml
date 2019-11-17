@@ -1,26 +1,31 @@
 version: 0.2
 
+env:
+  variables:
+    STACKNAME: "CodeBuild-SecurityHubRemediatations"
 phases:
   install:
     runtime-versions:
-      python: 3.7
+      # python: 3.7
       # docker 18
     commands:
       - echo Entered the install phase...
-      - yum update -y
-      - yum upgrade -y
+      # - yum update -y
+      # - yum upgrade -y
     finally:
       - echo This always runs even if the update or install command fails 
   pre_build:
     commands:
       - echo Entered the pre_build phase...
+      - aws --version
     finally:
       - echo This always runs even if the login command fails 
   build:
     commands:
       - echo Entered the build phase...
       - echo Build started on `date`
-      - aws cloudformation create-stack --template-body file://module1/securityhub-remediations-workshop.yml --stack-name CodeBuild-SecurityHubRemediatations  --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=VpcId,ParameterValue=CreateNew  --tags Key=CostCenter,Value=SecurityHubRemediatations-Codebuild
+      - aws cloudformation create-stack --template-body file://module1/securityhub-remediations-workshop.yml --stack-name $STACKNAME  --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=VpcId,ParameterValue=CreateNew  --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild
+      - aws cloudformation wait stack-create-complete --stack-name $STACKNAME --no-paginate 
     finally:
       - echo This always runs even if the install command fails
   post_build:
