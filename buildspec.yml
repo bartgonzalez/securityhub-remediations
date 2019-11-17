@@ -6,8 +6,8 @@ env:
 phases:
   install:
     runtime-versions:
-      python: 3.8
-      # docker: 19
+      # python: 3.8
+      docker: 19
     commands:
       - echo Entered the install phase...
       # - yum update -y
@@ -34,7 +34,15 @@ phases:
              --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild
       # --parameters ParameterKey=EnableGuardDuty,ParameterValue=False ParameterKey=EnableSecurityHub,ParameterValue=False
       - aws cloudformation wait stack-create-complete --stack-name $STACKNAME
-      - aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $(aws ec2 describe-instances --filters Name=tag:Name,Values="aws-cloud9-SecurityHubWorkshop*" Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text) 
+      - export CLIINSTANCE=`aws cloudformation --profile developer describe-stack-resource --stack-name aws-cloud9-SecurityHubWorkshop-`aws cloudformation --profile developer describe-stack-resource --stack-name CodeBuild-SecurityHubRemediatations --logical-resource-id SecHubWorkshopEnv --query StackResourceDetail.PhysicalResourceId --output text`  --logical-resource-id Instance --query StackResourceDetail.PhysicalResourceId --output text`
+      - aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $CLIINSTANCE
+      - aws ssm send-command --document-name AWS-RunShellScript 
+            --parameters commands=["git clone https://github.com/FireballDWF/securityhub-remediations.git /home/ec2-user/environment/securityhub-remediations && 
+                                    mkdir /home/ec2-user/environment/securityhub-remediations/output &&
+                                    docker run -it --rm --group-add 501 -v /home/ec2-user/environment/securityhub-remediations/output:/home/custodian/output:rw -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro ${SECHUBWORKSHOP_CONTAINER} run --cache-period 0 -s /home/custodian/output -c /home/custodian/securityhub-remediations/module2/ec2-sechub-custom-actions.yml
+                                   "] 
+            --targets Key=instanceids,Values=$CLIINSTANCE --comment "CodeBuild Test" 
+            --cloud-watch-output-config CloudWatchLogGroupName=/aws/ssm/AWS-RunShellScript,CloudWatchOutputEnabled=true
       # - aws cloudformation delete-stack --stack-name $STACKNAME
     finally:
       - echo This always runs even if the install command fails
