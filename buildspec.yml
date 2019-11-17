@@ -20,16 +20,16 @@ phases:
       - aws --version
       # - uname -a
       # - aws codebuild batch-get-projects --names "SecurityHubRemediationsWorkshop-Master" --query projects[*].[name,arn,environment.image]
-      - env | grep CODEBUILD
+      # - env | grep CODEBUILD
     finally:
       - echo This always runs even if the login command fails 
   build:
     commands:
       - echo Entered the build phase...
       - echo Build started on `date`
-      - aws cloudformation create-stack --template-body file://module1/securityhub-remediations-workshop.yml --stack-name $STACKNAME  \
-             --capabilities CAPABILITY_NAMED_IAM \
-             --parameters ParameterKey=VpcId,ParameterValue=vpc-d6fe6cb1  \
+      - aws cloudformation create-stack --template-body file://module1/securityhub-remediations-workshop.yml --stack-name $STACKNAME  
+             --capabilities CAPABILITY_NAMED_IAM 
+             --parameters ParameterKey=VpcId,ParameterValue=vpc-d6fe6cb1  
                           ParameterKey=Cloud9OwnerArn,ParameterValue=arn:aws:sts::369510138361:assumed-role/TeamRole/filiatra-Isengard
              --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild
       # --parameters ParameterKey=EnableGuardDuty,ParameterValue=False ParameterKey=EnableSecurityHub,ParameterValue=False
