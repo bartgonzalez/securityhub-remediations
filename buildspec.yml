@@ -6,8 +6,8 @@ env:
 phases:
   install:
     runtime-versions:
-      # python: 3.8
-      docker: 19
+      python: 3.8
+      # docker: 19
     commands:
       - echo Entered the install phase...
       # - yum update -y
