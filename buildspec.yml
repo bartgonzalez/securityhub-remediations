@@ -19,7 +19,8 @@ phases:
       - echo Entered the pre_build phase...
       - aws --version
       - uname -a
-      - env
+      - aws codebuild batch-get-projects --names "SecurityHubRemediationsWorkshop-Master" --query projects[*].[name,arn,environment.image]
+      - env | grep CODEBUILD
     finally:
       - echo This always runs even if the login command fails 
   build:
