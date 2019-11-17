@@ -34,7 +34,7 @@ phases:
              --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild
       # --parameters ParameterKey=EnableGuardDuty,ParameterValue=False ParameterKey=EnableSecurityHub,ParameterValue=False
       - aws cloudformation wait stack-create-complete --stack-name $STACKNAME
-      - export CLIINSTANCE=`aws cloudformation --profile developer describe-stack-resource --stack-name aws-cloud9-SecurityHubWorkshop-`aws cloudformation --profile developer describe-stack-resource --stack-name CodeBuild-SecurityHubRemediatations --logical-resource-id SecHubWorkshopEnv --query StackResourceDetail.PhysicalResourceId --output text`  --logical-resource-id Instance --query StackResourceDetail.PhysicalResourceId --output text`
+      - export CLIINSTANCE=`aws cloudformation describe-stack-resource --stack-name aws-cloud9-SecurityHubWorkshop-`aws cloudformation describe-stack-resource --stack-name CodeBuild-SecurityHubRemediatations --logical-resource-id SecHubWorkshopEnv --query StackResourceDetail.PhysicalResourceId --output text`  --logical-resource-id Instance --query StackResourceDetail.PhysicalResourceId --output text`
       - aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $CLIINSTANCE
       - aws ssm send-command --document-name AWS-RunShellScript 
             --parameters commands=["git clone https://github.com/FireballDWF/securityhub-remediations.git /home/ec2-user/environment/securityhub-remediations && 
