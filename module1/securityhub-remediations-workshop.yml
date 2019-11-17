@@ -67,7 +67,7 @@ Resources:
     Type: AWS::IAM::ManagedPolicy
     Properties: 
       ManagedPolicyName: "SecurityHubRemediationWorkshopTestTargetHighRisk"
-      Description: "Allows reading objects from any bucket"
+      Description: "Allows reading objects from any bucket. Overpriviledged for use in Module4"
       PolicyDocument: 
         Version: "2012-10-17"
         Statement: 

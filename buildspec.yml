@@ -7,7 +7,7 @@ phases:
   install:
     runtime-versions:
       python: 3.8
-      # docker: 19
+      # docker: 18
     commands:
       - echo Entered the install phase...
       # - yum update -y
@@ -27,14 +27,14 @@ phases:
     commands:
       - echo Entered the build phase...
       - echo Build started on `date`
-      - aws cloudformation create-stack --template-body file://module1/securityhub-remediations-workshop.yml --stack-name $STACKNAME  
+      - aws cloudformation create-stack --template-body file://module1/securityhub-remediations-workshop.yml --stack-name $CODEBUILD_BUILD_ID  
              --capabilities CAPABILITY_NAMED_IAM 
              --parameters ParameterKey=VpcId,ParameterValue=vpc-d6fe6cb1  
                           ParameterKey=Cloud9OwnerArn,ParameterValue=arn:aws:sts::369510138361:assumed-role/TeamRole/filiatra-Isengard
              --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild
       # --parameters ParameterKey=EnableGuardDuty,ParameterValue=False ParameterKey=EnableSecurityHub,ParameterValue=False
-      - aws cloudformation wait stack-create-complete --stack-name $STACKNAME
-      - export CLIINSTANCE=`aws cloudformation describe-stack-resource --stack-name aws-cloud9-SecurityHubWorkshop-`aws cloudformation describe-stack-resource --stack-name CodeBuild-SecurityHubRemediatations --logical-resource-id SecHubWorkshopEnv --query StackResourceDetail.PhysicalResourceId --output text`  --logical-resource-id Instance --query StackResourceDetail.PhysicalResourceId --output text`
+      - aws cloudformation wait stack-create-complete --stack-name $CODEBUILD_BUILD_ID
+      - export CLIINSTANCE=`aws cloudformation describe-stack-resource --stack-name aws-cloud9-SecurityHubWorkshop-`aws cloudformation describe-stack-resource --stack-name $CODEBUILD_BUILD_ID --logical-resource-id SecHubWorkshopEnv --query StackResourceDetail.PhysicalResourceId --output text`  --logical-resource-id Instance --query StackResourceDetail.PhysicalResourceId --output text`
       - aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $CLIINSTANCE
       - aws ssm send-command --document-name AWS-RunShellScript 
             --parameters commands=["git clone https://github.com/FireballDWF/securityhub-remediations.git /home/ec2-user/environment/securityhub-remediations && 
@@ -43,11 +43,11 @@ phases:
                                    "] 
             --targets Key=instanceids,Values=$CLIINSTANCE --comment "CodeBuild Test" 
             --cloud-watch-output-config CloudWatchLogGroupName=/aws/ssm/AWS-RunShellScript,CloudWatchOutputEnabled=true
-      # - aws cloudformation delete-stack --stack-name $STACKNAME
     finally:
       - echo This always runs even if the install command fails
   post_build:
     commands:
       - echo Entered the post_build phase...
+      - aws cloudformation delete-stack --stack-name $STACKNAME
       - echo Build completed on `date`
  
