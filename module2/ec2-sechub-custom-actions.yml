@@ -4,7 +4,7 @@ policies:
     description: Deny all access by removing Instance Profile, Stop the Instance
     mode:
         type: hub-action
-        role: arn:aws:iam::{account_id}:role/CloudCustodian
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodian
         memory: 128
         tags:
           CostCenter: SecurityHubWorkshop
@@ -23,7 +23,7 @@ policies:
     resource: iam-user
     mode:
         type: hub-action
-        role: arn:aws:iam::{account_id}:role/CloudCustodian
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodian
         memory: 128
         tags:
           CostCenter: SecurityHubWorkshop
@@ -37,7 +37,7 @@ policies:
     resource: ebs-snapshot
     mode:
         type: hub-action
-        role: arn:aws:iam::{account_id}:role/CloudCustodian
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodian
         memory: 128
         tags:
           CostCenter: SecurityHubWorkshop
@@ -50,7 +50,7 @@ policies:
     resource: ec2
     mode:
         type: hub-action
-        role: arn:aws:iam::{account_id}:role/CloudCustodian
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodian
         memory: 128
         tags:
           CostCenter: SecurityHubWorkshop
@@ -64,7 +64,7 @@ policies:
     resource: security-group
     mode:
         type: hub-action
-        role: arn:aws:iam::{account_id}:role/CloudCustodian
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodian
         memory: 128
         tags:
           CostCenter: SecurityHubWorkshop

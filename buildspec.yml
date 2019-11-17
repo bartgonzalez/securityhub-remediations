@@ -29,7 +29,7 @@ phases:
       - echo Build started on `date`
       - aws cloudformation create-stack --template-body file://module1/securityhub-remediations-workshop.yml --stack-name $STACKNAME  --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=VpcId,ParameterValue=vpc-d6fe6cb1  --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild
       - aws cloudformation wait stack-create-complete --stack-name $STACKNAME --no-paginate 
-      - aws cloudformation delete-stack --stack-name $STACKNAME
+      - # aws cloudformation delete-stack --stack-name $STACKNAME
     finally:
       - echo This always runs even if the install command fails
   post_build:
