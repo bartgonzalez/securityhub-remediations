@@ -19,13 +19,16 @@ policies:
         match-operator: or
         actions:
           - s3:GetObject
-          - s3:* 
+          - s3:GetObjectVersion
+          - s3:PutBucketWebsite
+          - s3:PutReplicationConfiguration
+          - s3:*
       - type: check-permissions
         match: allowed
         match-operator: or
         actions:
           - kms:Decrypt
-          - kms:* 
+          - kms:*
     actions:
       - type: post-finding
         severity_normalized: 70
@@ -36,7 +39,7 @@ policies:
         criticality: 100
         confidence: 99
         compliance_status: FAILED
-      # Uncomment the following line to auto-remediate, but application breakage will occur if there are application dependencies on the instance profile granted privileges     
+      # Uncomment the following line to auto-remediate, but application breakage will occur if there are application dependencies on the instance profile granted privileges
       #- type: set-instance-profile
         # By not specifying a name, will effectively disassociate-iam-instance-profile from matching ec2 instances
       - type: post-item

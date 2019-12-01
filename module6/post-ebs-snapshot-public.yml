@@ -1,11 +1,11 @@
 policies:
   - name: post-ebs-snapshot-public
+    description: post findings if snapshot shared outside of org which includes if public
     resource: ebs-snapshot
     mode:
       type: periodic
       schedule: "rate(5 minutes)"
       role: arn:aws:iam::{account_id}:role/CloudCustodian
-      packages: [botocore, boto3, urllib3]
       memory: 128
       tags:
         CostCenter: SecurityHubWorkshop
@@ -20,5 +20,6 @@ policies:
       types:
         - "Software and Configuration Checks/AWS Security Best Practices"
       recommendation: "Delete Snapshot or at least remove public access or any access outside your org"
+      recommendation_url: "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-modifying-snapshot-permissions.html"
       confidence: 100
       compliance_status: FAILED

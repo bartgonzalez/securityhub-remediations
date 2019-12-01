@@ -1,53 +1,86 @@
 version: 0.2
 
-env:
-  variables:
-    STACKNAME: "CodeBuild-SecurityHubRemediatations"
 phases:
   install:
     runtime-versions:
-      python: 3.8
+      python: 3.7
       # docker: 18
     commands:
-      - echo Entered the install phase...
+      # - echo Entered the install phase...
       # - yum update -y
-      # - yum upgrade -y
+      # - yum upgrade  -y
+      # - pip3 install -U awscli
+      # - curl https://s3.dualstack.us-east-1.amazonaws.com/aws-xray-assets.us-east-1/xray-daemon/aws-xray-daemon-2.x.rpm -o /home/ec2-user/xray.rpm
+      # - yum install -y /home/ec2-user/xray.rpm
     finally:
-      - echo This always runs even if the update or install command fails 
+      #- echo This always runs even if the update or install command fails
   pre_build:
     commands:
-      - echo Entered the pre_build phase...
-      - aws --version
-      # - uname -a
-      # - aws codebuild batch-get-projects --names "SecurityHubRemediationsWorkshop-Master" --query projects[*].[name,arn,environment.image]
-      # - env | grep CODEBUILD
+      # - echo Entered the pre_build phase...
     finally:
-      - echo This always runs even if the login command fails 
+      #- echo This always runs even if the login command fails
   build:
     commands:
-      - echo Entered the build phase...
-      - echo Build started on `date`
-      - aws cloudformation create-stack --template-body file://module1/securityhub-remediations-workshop.yml --stack-name $CODEBUILD_BUILD_ID  
-             --capabilities CAPABILITY_NAMED_IAM 
-             --parameters ParameterKey=VpcId,ParameterValue=vpc-d6fe6cb1  
-                          ParameterKey=Cloud9OwnerArn,ParameterValue=arn:aws:sts::369510138361:assumed-role/TeamRole/filiatra-Isengard
-             --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild
-      # --parameters ParameterKey=EnableGuardDuty,ParameterValue=False ParameterKey=EnableSecurityHub,ParameterValue=False
-      - aws cloudformation wait stack-create-complete --stack-name $CODEBUILD_BUILD_ID
-      - export CLIINSTANCE=`aws cloudformation describe-stack-resource --stack-name aws-cloud9-SecurityHubWorkshop-`aws cloudformation describe-stack-resource --stack-name $CODEBUILD_BUILD_ID --logical-resource-id SecHubWorkshopEnv --query StackResourceDetail.PhysicalResourceId --output text`  --logical-resource-id Instance --query StackResourceDetail.PhysicalResourceId --output text`
-      - aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $CLIINSTANCE
-      - aws ssm send-command --document-name AWS-RunShellScript 
-            --parameters commands=["git clone https://github.com/FireballDWF/securityhub-remediations.git /home/ec2-user/environment/securityhub-remediations && 
-                                    mkdir /home/ec2-user/environment/securityhub-remediations/output &&
-                                    docker run -it --rm --group-add 501 -v /home/ec2-user/environment/securityhub-remediations/output:/home/custodian/output:rw -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro ${SECHUBWORKSHOP_CONTAINER} run --cache-period 0 -s /home/custodian/output -c /home/custodian/securityhub-remediations/module2/ec2-sechub-custom-actions.yml
-                                   "] 
-            --targets Key=instanceids,Values=$CLIINSTANCE --comment "CodeBuild Test" 
-            --cloud-watch-output-config CloudWatchLogGroupName=/aws/ssm/AWS-RunShellScript,CloudWatchOutputEnabled=true
+      # - echo Entered the build phase at `date`
+      - echo $STACKACTION
+      - |
+        if [[ "$STACKACTION" = "update"]] || [["$STACKACTION" = "create" ]]
+        then
+          aws cloudformation $STACKACTION-stack --template-body file://module1/securityhub-remediations-workshop.yml
+            --stack-name $STACKPREFIX
+            --capabilities CAPABILITY_NAMED_IAM
+            --parameters $STACKPARAMETERS
+            --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild &&
+          aws cloudformation wait stack-$STACKACTION-complete --stack-name $STACKPREFIX
+        fi
+      - export CLIINSTANCE=$(aws ec2 describe-instances
+                            --filters Name="tag:aws:cloud9:environment",Values=`aws cloudformation describe-stack-resource --stack-name $STACKPREFIX
+                            --logical-resource-id SecHubWorkshopEnv --query StackResourceDetail.PhysicalResourceId --output text` Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text)
+      - echo ${CLIINSTANCE}
+      - |
+        if expr "${CLIINSTANCE}" : "" >/dev/null;
+        then
+          exit 1
+        fi
+      - |
+        if expr "${STACKACTION}" : "create" >/dev/null;
+        then
+          aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $CLIINSTANCE && sleep 220;
+          export GITCMD="git clone --single-branch --branch eventengineenablement https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations"
+        else
+          export GITCMD="cd securityhub-remediations && git pull"
+        fi
+      - export COMMANDID=$(aws ssm send-command --document-name AWS-RunShellScript
+            --targets Key=instanceids,Values=$CLIINSTANCE --comment "CodeBuild Test $CODEBUILD_BUILD_NUMBER"
+            --cloud-watch-output-config CloudWatchLogGroupName=$CWLGROUPNAME,CloudWatchOutputEnabled=true
+            --parameters  commands=["$GITCMD && docker run -i --rm --cap-drop ALL
+                                    -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro
+                                    -v /home/ec2-user/.aws:/home/custodian/.aws:ro
+                                    --env AWS_STS_REGIONAL_ENDPOINTS=regional
+                                    ${SECHUBWORKSHOP_CONTAINER}
+                                    run --region $AWS_REGION -s /tmp -c
+                                    securityhub-remediations/module2/ec2-sechub-custom-actions.yml
+                                    securityhub-remediations/module3/ec2-sechub-remediate-severity-with-findings.yml
+                                    securityhub-remediations/module4/ec2-public-ingress-hubfinding.yml
+                                    securityhub-remediations/module5/iam-user-hubfinding-remediate-disable.yml
+                                    securityhub-remediations/module6/post-ebs-snapshot-public.yml"],workingDirectory="/home/ec2-user/environment" --query Command.CommandId --output text)
+
+      #  same output as the send-command logging --log-driver=awslogs --log-opt awslogs-region=$AWS_REGION --log-opt awslogs-group=cloudcustodian-docker --log-opt awslogs-create-group=true
+      - sleep 40
+      - echo $COMMANDID
+      - aws ssm list-commands --command-id $COMMANDID --query Commands[0].[Status,StatusDetails,ErrorCount] --output text
+      - aws logs get-log-events --log-group-name $CWLGROUPNAME --query events[*].message --log-stream-name $COMMANDID/$CLIINSTANCE/aws-runShellScript/stdout
+      - aws logs get-log-events --log-group-name $CWLGROUPNAME --query events[*].message --log-stream-name $COMMANDID/$CLIINSTANCE/aws-runShellScript/stderr
+      - aws logs get-log-events --log-group-name $CWLGROUPNAME --query events[*].message --log-stream-name $COMMANDID/$CLIINSTANCE/aws-runShellScript/stderr | grep 'Provisioning policy lambda RemPA'
     finally:
-      - echo This always runs even if the install command fails
+      #- echo This always runs even if the install command fails
   post_build:
     commands:
-      - echo Entered the post_build phase...
-      - aws cloudformation delete-stack --stack-name $STACKNAME
+      # - echo Entered the post_build phase...
+      - |
+        if [ "$DELETESTACK" = "True" ]; then
+          aws cloudformation delete-stack --stack-name $STACKPREFIX
+        fi
+      # - aws --version
+      # - cat /etc/system-release
       - echo Build completed on `date`
- 

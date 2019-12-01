@@ -17,7 +17,7 @@ policies:
       #  value: GuardDuty
       # - type: event
       #    key: "detail.findings[].Resources[].Type"
-      #  value: AwsEc2Instance 
+      #  value: AwsEc2Instance
       # Filter for medium and high severity events from GuardDuty
       - type: event
         key: detail.findings[0].Severity.Normalized
@@ -27,13 +27,13 @@ policies:
         key: tag:Name
         value: RemediationTestTarget
       - type: finding
-        query: 
+        query:
           Type:
             - Value: "Software and Configuration Checks/Vulnerabilities"
               Comparison: EQUALS
     actions:
-      - type: set-instance-profile
-        # snapshot the disk for forensics
+      # - type: set-instance-profile
+      # snapshot the disk for forensics
       - type: snapshot
         copy-tags: [Name]
 

@@ -1,10 +1,11 @@
 policies:
   - name: DenySnapStop
     resource: ec2
-    description: Deny all access by removing Instance Profile, Stop the Instance
+    description: Deny all access by removing Instance Profile, Snapping the volume, and Stopping the Instance
     mode:
         type: hub-action
-        member-role: arn:aws:iam::{account_id}:role/CloudCustodian
+        role: arn:aws:iam::{account_id}:role/CloudCustodian
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodianMember
         memory: 128
         tags:
           CostCenter: SecurityHubWorkshop
@@ -17,18 +18,19 @@ policies:
         copy-tags: [Name]
         # stop the instance
       - stop
-      
+
   - name: DisableKey
     description: Disables access keys of the user
     resource: iam-user
     mode:
         type: hub-action
-        member-role: arn:aws:iam::{account_id}:role/CloudCustodian
+        role: arn:aws:iam::{account_id}:role/CloudCustodian
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodianMember
         memory: 128
         tags:
           CostCenter: SecurityHubWorkshop
           CreatedBy: CloudCustodian
-    actions: 
+    actions:
       - type: remove-keys
         disable: true
 
@@ -37,34 +39,38 @@ policies:
     resource: ebs-snapshot
     mode:
         type: hub-action
-        member-role: arn:aws:iam::{account_id}:role/CloudCustodian
+        role: arn:aws:iam::{account_id}:role/CloudCustodian
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodianMember
         memory: 128
         tags:
           CostCenter: SecurityHubWorkshop
           CreatedBy: CloudCustodian
-    actions: 
+    actions:
       - type: delete
 
   - name: PostOpsItem
-    description: Posts an Item to Systems Manager OpsCenter 
+    description: Posts an Item to Systems Manager OpsCenter
     resource: ec2
     mode:
         type: hub-action
-        member-role: arn:aws:iam::{account_id}:role/CloudCustodian
+        role: arn:aws:iam::{account_id}:role/CloudCustodian
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodianMember
         memory: 128
+        packages: [botocore, boto3, urllib3]
         tags:
           CostCenter: SecurityHubWorkshop
           CreatedBy: CloudCustodian
-    actions: 
+    actions:
       - type: post-item
         priority: 3
 
   - name: RemPA
-    description: Remove Public Ingress (IPV4 only) form Ingress Security Groups 
+    description: Remove Public Ingress (IPV4 only) form Ingress Security Groups
     resource: security-group
     mode:
         type: hub-action
-        member-role: arn:aws:iam::{account_id}:role/CloudCustodian
+        role: arn:aws:iam::{account_id}:role/CloudCustodian
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodianMember
         memory: 128
         tags:
           CostCenter: SecurityHubWorkshop
@@ -73,7 +79,6 @@ policies:
       - type: ingress
         Cidr:
           value: "0.0.0.0/0"
-    actions: 
+    actions:
       - type: remove-permissions
         ingress: matched
-          

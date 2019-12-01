@@ -6,89 +6,203 @@ Parameters:
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
     Description: 'See https://aws.amazon.com/blogs/compute/query-for-the-latest-amazon-linux-ami-ids-using-aws-systems-manager-parameter-store/'
   VpcId:
-    Type: 'AWS::EC2::VPC::Id'
+    Type: "String"
     Description: 'VpcId of where to create resources required for the Workshop'
-  CostCenter:
+    Default: "CreateNew"
+  VpcCidrBlock:
     Type: 'String'
-    Default: 'SecurityHubWorkshop'
-    Description: 'Value to use for the CostCenter tag applied to taggable resources created by this Workshop'
-  CreateCloud9Instance:
+    Description: 'Cidr block only needed if VpcId=CreateNew'
+    Default: '172.31.250.0/24'
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  EventEngine:
     Type: 'String'
-    Description: 'Boolean value if a Cloud9 instance should be created.  Optional, not required'
+    Description: "Change from True to False as if you are reading this then you are not using Event Engine"
+    Default: "True"
     AllowedValues:
-      - False
-      - True
-    Default: True
+      - "False"
+      - "True"
+  Cloud9OwnerArn:
+    Type: 'String'
+    Description: "Leave this value empty unless you have decided to go off the script of this Workshop. This parameter can use used to specifically populated the arn of the AWS Console role/user that will use the Cloud9 Environment.  If not populated, will result it being owned by the same user/role invoking the cloudformation, unless EventEngine=True.  If invoking from a command line, this parameter must be specified to be the Console user that with use the Cloud9 environment"
+    Default: ""
+    #AllowedPattern: "arn:aws:(iam|sts)::d+:(root|user|federated-user|assumed-role)/?S*"
   Cloud9InstanceType:
     Type: 'String'
     Default: 't2.micro'
     Description: 'The type of instance for the Cloud9 environment (for example, t2.micro)'
-    AllowedPattern: "^[a-z][1-9][.][a-z0-9]+$"
-  Cloud9EnvName:
-    Type: 'String'
-    Description: 'Name of the Cloud9 Environment'
-    Default: 'SecurityHubWorkshop'
   TestTargetInstanceType:
     Type: 'String'
     Default: 't2.micro'
     Description: 'The type of instance for the Remediation Test Target (for example, t2.micro)'
-    AllowedPattern: "^[a-z][1-9][.][a-z0-9]+$"
-  Cloud9OwnerArn: 
-    Type: 'String'
-    Description: "If CreateCloud9Instance = True, then this parameter should be populated with the arn of the AWS Console role/user that will use the Cloud9 Environment.  If not populated, will result it being owned by the user invoking the Cloudformation.  Thus if using Console for creating the stack, then the same console user will be able to use the Cloud9Env.  If invoking from a command line, and the cli user/role is not the same same as the console user, then this parameter must be specified"
-    Default: ""
-    #AllowedPattern: "arn:aws:(iam|sts)::d+:(root|user|federated-user|assumed-role)/?S*"
-  Cloud9AutomaticStopTime: 
+  Cloud9AutomaticStopTime:
     Type: 'Number'
     Description: "Configures the idle timeout of the Cloud9 instance resulting in it being stopped"
     Default: 60
+  EnableGuardDuty:
+    Type: 'String'
+    Description: "Enable Guard Duty, set to false if already enabled in account"
+    Default: "True"
+    AllowedValues:
+      - "False"
+      - "True"
+  EnableSecurityHub:
+    Type: 'String'
+    Description: "Enable Security Hub, set to false if already enabled in account"
+    Default: "True"
+    AllowedValues:
+      - "False"
+      - "True"
+  CreateCloudCustodianMemberRole:
+    Type: String
+    Description: "Create the Member Role in this account via this template. Set this to False if already created, like via a StackSet or other method"
+    Default: "True"
+    AllowedValues:
+      - "False"
+      - "True"
+  CreateCloud9Instance:
+    Type: 'String'
+    Description: 'Boolean value which Defaults to True.  Only set to False if you are not intend to follow the script of the Workshop'
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "True"
+  CostCenter:
+    Type: 'String'
+    Default: 'SecurityHubWorkshop'
+    Description: 'Value to use for the CostCenter tag applied to taggable resources created by this Workshop'
 
 Conditions:
-  CreateCloud9Instance: !Equals [ !Ref CreateCloud9Instance, True]
-  Cloud9OwnerArnEmpty: !Equals [ !Ref Cloud9OwnerArn, ""]
-  
+  CreateCloud9Instance: !Equals [!Ref CreateCloud9Instance, "True"]
+  EventEngine: !Equals [!Ref EventEngine, "True"]
+  Cloud9OwnerArnEmpty: !Equals [!Ref Cloud9OwnerArn, ""]
+  CreateVPC: !Equals [!Ref VpcId, "CreateNew"]
+  EnableGuardDuty: !Equals [!Ref EnableGuardDuty, "True"]
+  EnableSecurityHub: !Equals [!Ref EnableSecurityHub, "True"]
+  CreateCloudCustodianMemberRole: !Equals [!Ref CreateCloudCustodianMemberRole, "True"]
+
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+      - E3002
+
 Resources:
+  WorkshopVpc:
+    Condition: CreateVPC
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref "VpcCidrBlock"
+      EnableDnsHostnames: True
+      EnableDnsSupport: True
+      Tags:
+        - Key: "Name"
+          Value: "WorkshopVpc"
+        - Key: "CostCenter"
+          Value: !Ref "CostCenter"
+
+  WorkshopIGW:
+    Condition: CreateVPC
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: "Name"
+          Value: "WorkshopIGW"
+        - Key: "CostCenter"
+          Value: !Ref "CostCenter"
+
+  IGWAttachment:
+    Condition: CreateVPC
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref "WorkshopIGW"
+      VpcId: !Ref "WorkshopVpc"
+
+  WorkshopSubnet:
+    Condition: CreateVPC
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref "VpcCidrBlock"
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: "Name"
+          Value: "WorkshopSubnet"
+        - Key: "CostCenter"
+          Value: !Ref "CostCenter"
+      VpcId: !Ref "WorkshopVpc"
+
+
+  PublicRouteTable:
+    Condition: CreateVPC
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref "WorkshopVpc"
+      Tags:
+        - Key: Name
+          Value: "Workshop Public Routes"
+        - Key: "CostCenter"
+          Value: !Ref "CostCenter"
+
+  DefaultPublicRoute:
+    Condition: CreateVPC
+    Type: AWS::EC2::Route
+    DependsOn:  IGWAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref WorkshopIGW
+
+  PublicSubnet1RouteTableAssociation:
+    Condition: CreateVPC
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref WorkshopSubnet
+
   SecHubWorkshopEnv:
     Condition: CreateCloud9Instance
     Type: AWS::Cloud9::EnvironmentEC2
-    Properties: 
+    Properties:
       Description: "Security Hub Remediations Workshop"
       InstanceType: !Ref "Cloud9InstanceType"
-      Name: !Ref "Cloud9EnvName"
       AutomaticStopTimeMinutes: !Ref "Cloud9AutomaticStopTime"
-      OwnerArn: 
+      OwnerArn:
         Fn::If:
-        - Cloud9OwnerArnEmpty
+        - EventEngine
+        - !Sub 'arn:aws:sts::${AWS::AccountId}:assumed-role/TeamRole/MasterKey'
+        - Fn::If:
+          - Cloud9OwnerArnEmpty
+          - Ref: AWS::NoValue
+          - Ref: Cloud9OwnerArn
+      SubnetId:
+        Fn::If:
+        - CreateVPC
+        - !Ref "WorkshopSubnet"
         - Ref: AWS::NoValue
-        - Ref: Cloud9OwnerArn
-      # SubnetId:
 
   TestTargetHighRiskPolicy:
     Type: AWS::IAM::ManagedPolicy
-    Properties: 
-      ManagedPolicyName: "SecurityHubRemediationWorkshopTestTargetHighRisk"
-      Description: "Allows reading objects from any bucket. Overpriviledged for use in Module4"
-      PolicyDocument: 
+    Properties:
+      Description: "Allows reading objects from any bucket"
+      PolicyDocument:
         Version: "2012-10-17"
-        Statement: 
+        Statement:
           -
             Sid: "Module4Overpriviledged"
             Effect: "Allow"
             Action:
               - "s3:GetObject"
             Resource: "*"
-  
+
   CliHostPolicy:
     Type: AWS::IAM::ManagedPolicy
-    Properties: 
-      ManagedPolicyName: "SecurityHubWorkshopCliHost"
+    Properties:
       Description: "Enables the cli host to invoke AWS apis"
-      PolicyDocument: 
+      PolicyDocument:
         Version: "2012-10-17"
-        Statement: 
+        Statement:
           -
             Effect: "Allow"
-            Action: 
+            Action:
               - "ec2:StartInstances"
               - "ec2:TerminateInstances"
               - "ec2:Describe*"
@@ -96,20 +210,28 @@ Resources:
               - "guardduty:ArchiveFindings"
               - "ssm:SendCommand"
               - "lambda:ListFunctions"
+              - "ec2:CreateVolume"
+              - "ec2:*Snapshot"
+              - "ec2:ModifySnapshotAttribute"
+              - "logs:GetLogEvents"
             Resource: "*"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F5
+            reason: "Comfortable with these wildcards on part of action name"
 
   CloudCustodianLambdaDeploymentManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
-    Properties: 
-      ManagedPolicyName: CloudCustodianLambdaDeployment
+    Properties:
       Description: "Required for deployment by lambda's generated by CloudCustodian policies Mode section"
-      PolicyDocument: 
+      PolicyDocument:
         Version: "2012-10-17"
-        Statement: 
+        Statement:
           -
             Sid: "CCDeployLambdas"
             Effect: "Allow"
-            Action: 
+            Action:
               - "lambda:CreateFunction"
               - "lambda:InvokeFunction"
               - "lambda:UpdateFunctionConfiguration"
@@ -131,26 +253,48 @@ Resources:
             Resource:
               - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:custodian-*'
           -
+            Sid: "Events"
+            Effect: "Allow"
+            Action:
+              - "events:PutRule"
+              - "events:PutTargets"
+              - "events:Describe*"
+              - "events:List*"
+              - "securityhub:*ActionTarget*"
+              - "logs:FilterLogEvents"
+              - "logs:GetLogEvents"
+              - "xray:PutTraceSegments"
+              - "xray:PutTelemetryRecords"
+              - "xray:GetSamplingRules"
+              - "xray:GetSamplingTargets"
+              - "xray:GetSamplingStatisticSummaries"
+            Resource: "*"
+          -
             Sid: "CCPassRole"
             Effect: "Allow"
             Action:
               - "iam:PassRole"
             Resource:
               - !Sub 'arn:aws:iam::${AWS::AccountId}:role/CloudCustodian'
-             
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F5
+            reason: "Comfortable with these wildcards on part of action name"
+
   CloudCustodianPolicyActions:
     Type: AWS::IAM::ManagedPolicy
-    Properties: 
-      ManagedPolicyName: CloudCustodianPolicyActions
+    Properties:
       Description: "IAM Actions required to execute to Actions part of a CloudCustodian policies"
-      PolicyDocument: 
+      PolicyDocument:
         Version: "2012-10-17"
-        Statement: 
+        Statement:
           -
             Sid: "CCPolicyActionExecution"
             Effect: "Allow"
-            Action: 
+            Action:
               - "ssm:SendCommand"
+              - "ssm:ListCommands"
               - "ssm:CreateOpsItem"
               - "iam:DeleteAccessKey"
               - "iam:UpdateAccessKey"
@@ -158,14 +302,13 @@ Resources:
               - "iam:UnTag*"
               - "kms:UntagResource"
               - "kms:TagResource"
-              - "events:PutRule"
-              - "events:PutTargets"
               - "ec2:CopySnapshot"
               - "ec2:DeleteSnapshot"
               - "ec2:CreateImage"
               - "ec2:CreateSnapshot*"
               - "ec2:CreateTags"
               - "ec2:DeleteTags"
+              - "ec2:DeleteSecurityGroup"
               - "ec2:ModifyVpcAttribute"
               - "ec2:ModifyInstanceAttribute"
               - "ec2:AssociateIamInstanceProfile"
@@ -177,14 +320,39 @@ Resources:
               - "config:PutEvaluations"
               - "s3:PutBucketTagging"
               - "s3:PutBucketPolicy"
+              - "s3:DeleteBucket*"
               - "tag:TagResources"
               - "tag:UntagResources"
               - "lambda:TagResource"
               - "lambda:UntagResource"
+              - "lambda:DeleteFunction"
               - "elasticfilesystem:CreateTags"
               - "elasticfilesystem:DeleteTags"
               - "logs:TagLogGroup"
-              - "logs:UntagLogGroup" 
+              - "logs:UntagLogGroup"
+              - "rds:*TagsToResource"
+              - "rds:Delete*"
+              - "rds:CreateDBSnapshot"
+              - "rds:Stop*"
+              - "elasticache:*Snapshot"
+              - "elasticache:DeleteCacheCluster"
+              - "dynamodb:DeleteTable"
+              - "dynamodb:TagResource"
+              - "dynamodb:UntagResource"
+              - "es:DeleteElasticsearchDomain"
+              - "es:*Tags"
+              - "elasticmapreduce:TerminateJobFlows"
+              - "elasticmapreduce:*Tags"
+              - "redshift:DeleteCluster"
+              - "redshift:*Tags"
+              - "autoscaling:DetachInstances"
+              - "autoscaling:*Tags"
+              - "autoscaling:*Processes"
+              - "autoscaling:Terminate*"
+              - "autoscaling:Set*"
+              - "autoscaling:*Standby"
+              - "kinesis:*Stream"
+              - "kinesisanalytics:DeleteApplication"
             Resource: "*"
           -
             Sid: "CCSecurityHubActions"
@@ -194,6 +362,7 @@ Resources:
               - "securityhub:BatchImportFindings"
               - "securityhub:CreateActionTarget"
               - "securityhub:UpdateActionTarget"
+              - "securityhub:SendFindingEvents"
             Resource: "*"
           -
             Sid: "LambdasInVpc"
@@ -202,11 +371,17 @@ Resources:
               - "ec2:DeleteNetworkInterface"
               - "ec2:CreateNetworkInterface"
             Resource: "*"
-            
-  TestTargetRole: 
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F5
+            reason: "Comfortable with these wildcards on part of action name"
+
+  TestTargetRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: "SecurityHubRemediationWorkshopTestTarget"
+      Description: "Actions needed for the Test Target"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -214,19 +389,28 @@ Resources:
             Effect: "Allow"
             Principal:
               Service:
-                - "ec2.amazonaws.com" 
-            Action: 
+                - "ec2.amazonaws.com"
+            Action:
               - "sts:AssumeRole"
       Path: "/"
-      ManagedPolicyArns: 
+      ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
         - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         - Ref: "TestTargetHighRiskPolicy"
-  
-  CliInstance:            
+      Tags:
+        - Key: "CostCenter"
+          Value: !Ref "CostCenter"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F5
+            reason: "Need ability to reference role arn from cli. TODO: dynamically lookup arn from cli"
+
+  CliInstance:
     Type: AWS::IAM::Role
     Properties:
       RoleName: "SecurityHubRemediationWorkshopCli"
+      Description: "Actions needed for the SecurityHub Workshop Cloud9 Cli"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -234,18 +418,24 @@ Resources:
             Effect: "Allow"
             Principal:
               Service:
-                - "ec2.amazonaws.com" 
-            Action: 
+                - "ec2.amazonaws.com"
+            Action:
               - "sts:AssumeRole"
       Path: "/"
-      ManagedPolicyArns: 
+      ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
         - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         - Ref: "CliHostPolicy"
-        - "arn:aws:iam::aws:policy/SecurityAudit"
         - Ref: "CloudCustodianLambdaDeploymentManagedPolicy"
-        - Ref: "CloudCustodianPolicyActions"
-        
+      Tags:
+        - Key: "CostCenter"
+          Value: !Ref "CostCenter"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F5
+            reason: "Need ability to reference role arn from cli. TODO: dynamically lookup arn from cli"
+
   CliInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
@@ -253,20 +443,46 @@ Resources:
       Path: "/"
       Roles:
         - Ref: "CliInstance"
-        
+
   TestTargetInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
       InstanceProfileName: "SecurityHubRemediationWorkshopTestTarget"
       Path: "/"
       Roles:
-        - Ref: "TestTargetRole"  
+        - Ref: "TestTargetRole"
 
+  CloudCustodianLambdaExecutionMember:
+    Condition: CreateCloudCustodianMemberRole
+    DependsOn: CloudCustodianLambdaExecution
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: "CloudCustodianMember"
+      Description: "Actions needed for the Cloud Custodian in Lambda mode"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              AWS:
+                - !Sub 'arn:aws:iam::${AWS::AccountId}:role/CloudCustodian'
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/SecurityAudit"
+        - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        - Ref: "CloudCustodianPolicyActions"
+      Tags:
+        - Key: "CostCenter"
+          Value: !Ref "CostCenter"
 
-  CloudCustodianLambdaExecution: 
+  CloudCustodianLambdaExecution:
     Type: AWS::IAM::Role
     Properties:
       RoleName: "CloudCustodian"
+      Description: "Actions needed for the Cloud Custodian in Lambda mode"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -275,75 +491,124 @@ Resources:
             Principal:
               Service:
                 - lambda.amazonaws.com
-            Action: 
+            Action:
               - "sts:AssumeRole"
       Path: "/"
-      ManagedPolicyArns: 
+      ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/SecurityAudit"
         - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         - Ref: "CloudCustodianPolicyActions"
+      Tags:
+        - Key: "CostCenter"
+          Value: !Ref "CostCenter"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F5
+            reason: "Need ability to reference role arn from Cloud Custodian policy yml file"
 
-  CloudCustodianCli: 
+  CloudCustodianCli:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: "CloudCustodianCli"
+      Description: "Actions needed for the Cloud Custodian in cli mode"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
           -
             Effect: "Allow"
             Principal:
-              AWS: 
+              AWS:
                 - Fn::GetAtt: [CliInstance, Arn]
-            Action: 
+            Action:
               - "sts:AssumeRole"
       Path: "/"
-      ManagedPolicyArns: 
+      ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/SecurityAudit"
         - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         - Ref: "CloudCustodianLambdaDeploymentManagedPolicy"
         - Ref: "CloudCustodianPolicyActions"
+      Tags:
+        - Key: "CostCenter"
+          Value: !Ref "CostCenter"
 
   RemediationTargetSG:
     Type: AWS::EC2::SecurityGroup
-    Properties: 
-      GroupDescription: "SecurityHub Remediation Test Target" 
-      GroupName: "SecurityHubRemediationsTestTarget"
-      VpcId: !Ref "VpcId"
-      Tags: 
-        - 
-          Key: "Name"
-          Value: "SecurityHubRemediationsTestTarget"
+    Properties:
+      GroupDescription: "SecurityHub Remediation Test Target"
+      VpcId:
+        Fn::If:
+        - CreateVPC
+        - !Ref WorkshopVpc
+        - !Ref VpcId
+      Tags:
+        - Key: "Name"
+          Value: "SG-SecurityHubRemediationsTestTarget"
         - Key: "CostCenter"
           Value: !Ref "CostCenter"
       SecurityGroupIngress:
         - CidrIp: "0.0.0.0/0"
-          Description: "Public ingress to port 443 however the EC2 instance it will be attached to will not have a process listening to that port, and is udp rather than tcp to cut the noise"
+          Description: "Dont Panic! Intentional Public ingress to port 443 to test remediation actions.  Risk is mitigated as attached EC2 instance will not have a process listening, and is udp not tcp"
           FromPort: 443
           ToPort: 443
           IpProtocol: udp
-          
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F1000
+            reason: "Not worth addressing"
+          - id: W2
+            reason: "Purpose is to show ability to remediate this.  May change to adding ingress rule only right before needed in Workshop"
+          - id: W9
+            reason: "Same as above"
+
   RemediationTestTarget:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !Ref "LatestAmiId" 
+      ImageId: !Ref "LatestAmiId"
       InstanceType: !Ref "TestTargetInstanceType"
       Tags:
         - Key: "Name"
           Value: "RemediationTestTarget"
         - Key: "CostCenter"
-          Value: !Ref "CostCenter"  
+          Value: !Ref "CostCenter"
       SecurityGroupIds:
         - Ref: "RemediationTargetSG"
       IamInstanceProfile: !Ref "TestTargetInstanceProfile"
-  
-  GeneratedFindingUser:    
+      SubnetId:
+        Fn::If:
+        - CreateVPC
+        - !Ref WorkshopSubnet
+        - !Ref AWS::NoValue
+
+  GeneratedFindingUser:
     Type: AWS::IAM::User
-    Properties: 
+    Properties:
       UserName: GeneratedFindingUserName
-      
-  GeneratedFindingUserAccessKey: 
+      Tags:
+        - Key: "CostCenter"
+          Value: !Ref "CostCenter"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F2000
+            reason: "Test Purposes only"
+
+
+  GeneratedFindingUserAccessKey:
     DependsOn: GeneratedFindingUser
     Type: AWS::IAM::AccessKey
-    Properties: 
+    Properties:
       UserName: GeneratedFindingUserName
+
+  GuardDutyDetector:
+    Condition: EnableGuardDuty
+    Type: AWS::GuardDuty::Detector
+    Properties:
+      Enable: True
+
+  SecurityHub:
+    Condition: EnableSecurityHub
+    Type: AWS::SecurityHub::Hub
+    Properties:
+      Tags:
+          CostCenter: !Ref "CostCenter"

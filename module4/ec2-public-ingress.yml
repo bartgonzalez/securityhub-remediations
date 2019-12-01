@@ -1,20 +1,8 @@
 policies:
-  - name: ec2-public-ingress-hubfinding
+  - name: ec2-public-ingress
     description: filters for ec2 instances with security-groups with ingress rule allowing public access
     resource: ec2
-    mode:
-        type: hub-finding
-        role: arn:aws:iam::{account_id}:role/CloudCustodian
-        memory: 128
-        packages: [botocore, boto3, urllib3]
-        concurrency: 5
-        tags:
-          CostCenter: SecurityHubWorkshop
-          CreatedBy: CloudCustodian
     filters:
-      - type: event
-        key: detail.findings[0].Resources[0].Type
-        value: AwsEc2Instance
       - type: value
         key: PublicIpAddress
         value: not-null
@@ -36,10 +24,10 @@ policies:
           - s3:PutBucketWebsite
           - s3:PutReplicationConfiguration
           - s3:*
-
     actions:
       # snapshot the disk for forensics
       - type: snapshot
         copy-tags: [Name]
       # Remove priviledges from the instance
       - type: set-instance-profile
+      # remove from any ASG or clustering - Enhancement request (at least for ASG.  Clustering TBD)
