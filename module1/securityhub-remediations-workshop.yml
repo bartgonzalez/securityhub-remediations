@@ -41,14 +41,14 @@ Parameters:
   EnableGuardDuty:
     Type: 'String'
     Description: "Enable Guard Duty, set to false if already enabled in account"
-    Default: "True"
+    Default: "False"
     AllowedValues:
       - "False"
       - "True"
   EnableSecurityHub:
     Type: 'String'
     Description: "Enable Security Hub, set to false if already enabled in account"
-    Default: "True"
+    Default: "False"
     AllowedValues:
       - "False"
       - "True"
