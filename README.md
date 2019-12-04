@@ -35,7 +35,7 @@ The automated remediations in this workshop will be deployed by executing Cloud 
 
 ## Module 1 - Environment Build and Configuration
 
-To Get started with this workshop as part of the an AWS Event where Event Engine is being used, please follow the steps directly following, otherwise skip down to the section labels "Getting Started using your own account".
+To Get started with this workshop as part of the an AWS Event where Event Engine is being used, please follow the steps directly following, otherwise skip down to the section labeled "Getting Started using your own account".
 
 ### Getting Started at AWS event where the Event Engine is being used
 
