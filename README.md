@@ -75,10 +75,12 @@ wget https://github.com/FireballDWF/securityhub-remediations/blob/master/module1
 aws securityhub enable-security-hub
 ```
 If you get an error the most likely reason is that it is already enabled (assuming you have full unresticted Admin Access)
+
 5.  You need to have GuardDuty enabled on the account for module 2 and 5 to work, if not yet then either run the following command or follow the [steps to enable on the console](https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_settingup.html#guardduty_enable-gd)
 ```
 aws guardduty create-detector --enable
 ```
+
 6.  The next step is to get a copy of the files required for this workshop by cloning the workshop's github repo specifing the eventengine branch.
 ```
 git clone --single-branch --branch eventengineenablement https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations
