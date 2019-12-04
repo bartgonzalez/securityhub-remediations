@@ -26,12 +26,12 @@ The automated remediations in this workshop will be deployed by executing Cloud 
 
 # Modules
 
-1. Module 1 - Environment Build and Configuration
-2. Module 2 - Automated Remediations - GuardDuty DNS Event on EC2 Instance
-3. Module 3 - Security Hub Custom Actions - Human initiated automation
-4. Module 4 - Automated Remediations - Vulnerability Event on EC2 Instance with Very Risky Configuration
-5. Module 5 - Automated Remediations - GuardDuty Event on IAMUser
-6. Module 6 - Remediate an Public EBS-Snapshot
+1. [Module 1 - Environment Build and Configuration](#module-1---environment-build-and-configuration)
+2. [Module 2 - Automated Remediations - GuardDuty DNS Event on EC2 Instance](#module-2---automated-remediations---guardduty-dns-event-on-ec2-instance)
+3. [Module 3 - Security Hub Custom Actions - Human initiated automation](https://github.com/FireballDWF/securityhub-remediations/blob/master/README.md#module-3---security-hub-custom-actions---human-initiated-automation)
+4. [Module 4 - Automated Remediations - Vulnerability Event on EC2 Instance with Very Risky Configuration](#module-4---automated-remediations---vulnerability-event-on-ec2-instance-with-very-risky-configuration)
+5. [Module 5 - Automated Remediations - GuardDuty Event on IAMUser](#module-5---automated-remediations---guardduty-event-on-iamuser)
+6. [Module 6 - Remediate an Public EBS-Snapshot](#module-6---remediate-an-public-ebs-snapshot)
 
 ## Module 1 - Environment Build and Configuration
 
@@ -43,7 +43,7 @@ To Get started with this workshop as part of the an AWS Event where Event Engine
 2. Enter the team hash code that you were provided and click Proceed.
 3. Look for a section of the page labeled "Event Engine Team Role" then click "Open Console" button within the Login Link section
 4. Make sure you are in the correct region.
-5. Skip the "Getting started using your own account" and continue with the "Manual Setup Steps"
+5. Skip the ["Getting started using your own account"](#getting-started-using-your-own-account) and continue with the ["Manual Setup Steps"](#manual-setup-steps)
 
 ### Getting Started using your own account:
 1. In order to complete this workshop, you'll need a valid, usable AWS Account. Use a personal account or create a new AWS account to ensure you have the necessary access and that you do not accidentally modify corporate resources. Do not use an AWS account from the company you work for unless you have explicit approval to conduct security related training exercises in it. We strongly recommend that you use a non-production AWS account for this workshop such as a training, sandbox or personal account. Attempts by multiple participants to use the same account for this workshop will fail, due to the deployment of Named IAM Roles and Users.
