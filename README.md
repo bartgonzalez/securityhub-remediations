@@ -70,17 +70,14 @@ wget https://github.com/FireballDWF/securityhub-remediations/blob/master/module1
 1.  Open the Cloud9 IDE which provides the ability to review files and execute commands in a browser based terminal window.  Starting from the main AWS Management Console, within the "Find Services" textbox, type "Cloud9" then hit Enter.
 2.  Now click the "Open IDE" button.
 3.  In the bottom part of the browser tab which opens up, look for a tab with a label starting with "bash", where the window contents contain "~/environment $".  This is the browser based terminal session you'll use for the rest of the workshop for any command line steps.
-4. Run the following command to enable SecurityHub in the account, unless you are using your own account and know that it's already enabled:
+4. Run the following command to enable SecurityHub in the account, unless you are using your own account and know that it's already enabled. If you have full unresticted Admin Access, and get an error, then the most likely reason is that it is already enabled.
 ```
 aws securityhub enable-security-hub
 ```
-If you get an error the most likely reason is that it is already enabled (assuming you have full unresticted Admin Access)
-
 5.  You need to have GuardDuty enabled on the account for module 2 and 5 to work, if not yet then either run the following command or follow the [steps to enable on the console](https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_settingup.html#guardduty_enable-gd)
 ```
 aws guardduty create-detector --enable
 ```
-
 6.  The next step is to get a copy of the files required for this workshop by cloning the workshop's github repo specifing the eventengine branch.
 ```
 git clone --single-branch --branch eventengineenablement https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations
