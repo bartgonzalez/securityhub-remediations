@@ -1,0 +1,13 @@
+policies:
+  - name: s3-bucket-encryption-KMS-aws-managed-cmk
+    resource: s3
+    region: us-east-1
+    filters:
+      - type: bucket-encryption
+        state: True
+        crypto: aws:kms
+      - type: value
+        # Need https://github.com/cloud-custodian/cloud-custodian/issues/5180 implemented then filters updated
+        key: "\"c7n:bucket-encryption\".ServerSideEncryptionConfiguration.Rules[0].ApplyServerSideEncryptionByDefault.KMSMasterKeyID"
+        op: regex
+        value: ^(.*:alias\/aws\/.*)$
