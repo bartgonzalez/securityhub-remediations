@@ -214,6 +214,7 @@ Resources:
               - "ec2:*Snapshot"
               - "ec2:ModifySnapshotAttribute"
               - "logs:GetLogEvents"
+              - "cloudformation:ValidateTemplate"
             Resource: "*"
     Metadata:
       cfn_nag:
