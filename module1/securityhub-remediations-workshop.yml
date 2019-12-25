@@ -551,6 +551,17 @@ Resources:
           FromPort: 443
           ToPort: 443
           IpProtocol: udp
+      SecurityGroupEgress:
+        - CidrIp: "0.0.0.0/0"
+          Description: "Expected usage is for Systems Manager"
+          FromPort: 443
+          ToPort: 443
+          IpProtocol: tcp
+        - CidrIp: "0.0.0.0/0"
+          Description: "Allow dns lookups"
+          FromPort: 53
+          ToPort: 53
+          IpProtocol: udp
     Metadata:
       cfn_nag:
         rules_to_suppress:
@@ -592,7 +603,6 @@ Resources:
         rules_to_suppress:
           - id: F2000
             reason: "Test Purposes only"
-
 
   GeneratedFindingUserAccessKey:
     DependsOn: GeneratedFindingUser

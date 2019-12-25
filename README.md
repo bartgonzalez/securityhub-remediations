@@ -14,7 +14,7 @@ Your feedback is highly desired, please [submit a new issue](https://github.com/
 * Duration: 1:00 - 2:00 hours
 * CSF Functions: Detect, Respond
 * CAF Components: Detective, Responsive
-* Prerequisites: AWS Account with an Admin IAM user/role with AWS CLI configured. If you are doing this Workshop as part of an AWS Event where Event Engine is being used, these will be supplied.
+* Prerequisites: AWS Account with an Admin IAM user/role with [AWS CLI](https://aws.amazon.com/cli/) configured. If you are doing this Workshop as part of an AWS Event where Event Engine is being used, these will be supplied.
 
 # Scenario
 
