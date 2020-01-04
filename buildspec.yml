@@ -53,12 +53,13 @@ phases:
       - export COMMANDID=$(aws ssm send-command --document-name AWS-RunShellScript
             --targets Key=instanceids,Values=$CLIINSTANCE --comment "CodeBuild Test $CODEBUILD_BUILD_NUMBER"
             --cloud-watch-output-config CloudWatchLogGroupName=$CWLGROUPNAME,CloudWatchOutputEnabled=true
-            --parameters  commands=["$GITCMD && docker run -i --rm --cap-drop ALL
+            --parameters  commands=["$GITCMD && docker run -i --rm --cap-drop ALL --env AWS_DEFAULT_REGION
                                     -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro
                                     -v /home/ec2-user/.aws:/home/custodian/.aws:ro
                                     --env AWS_STS_REGIONAL_ENDPOINTS=regional
                                     ${SECHUBWORKSHOP_CONTAINER}
-                                    run --region $AWS_REGION -s /tmp -c
+                                    run -s /tmp -c
+                                    securityhub-remediations/module1/force-vulnerability-finding.yml
                                     securityhub-remediations/module2/ec2-sechub-custom-actions.yml
                                     securityhub-remediations/module3/ec2-sechub-remediate-severity-with-findings.yml
                                     securityhub-remediations/module4/ec2-public-ingress-hubfinding.yml

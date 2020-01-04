@@ -428,6 +428,7 @@ Resources:
         - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         - Ref: "CliHostPolicy"
         - Ref: "CloudCustodianLambdaDeploymentManagedPolicy"
+        - Ref: "CloudCustodianPolicyActions"
       Tags:
         - Key: "CostCenter"
           Value: !Ref "CostCenter"
