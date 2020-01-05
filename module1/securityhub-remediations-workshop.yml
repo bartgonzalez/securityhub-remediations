@@ -265,7 +265,7 @@ Resources:
             Resource:
               - !Sub 'arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/custodian-*'
           -
-            Sid: "Events"
+            Sid: "Misc"
             Effect: "Allow"
             Action:
               - "securityhub:*ActionTarget*"
