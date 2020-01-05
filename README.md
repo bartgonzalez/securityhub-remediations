@@ -78,9 +78,9 @@ aws securityhub enable-security-hub
 ```
 aws guardduty create-detector --enable
 ```
-6.  The next step is to get a copy of the files required for this workshop by cloning the workshop's github repo specifing the eventengine branch.
+6.  The next step is to get a copy of the files required for this workshop by cloning the workshop's github repo.
 ```
-git clone --single-branch --branch eventengineenablement https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations
+git clone --single-branch --branch master https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations
 ```
 7.  Next step is to pull down the latest version of the Cloud Custodian docker container image and setup the repeative part of the command line
 ```
