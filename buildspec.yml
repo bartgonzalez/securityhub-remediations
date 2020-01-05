@@ -23,16 +23,13 @@ phases:
     commands:
       # - echo Entered the build phase at `date`
       - echo $STACKACTION
-      - |
-        if [[ "$STACKACTION" = "update"]] || [["$STACKACTION" = "create" ]]
-        then
-          aws cloudformation $STACKACTION-stack --template-body file://module1/securityhub-remediations-workshop.yml
+      - aws cloudformation $STACKACTION-stack --template-body file://module1/securityhub-remediations-workshop.yml
             --stack-name $STACKPREFIX
             --capabilities CAPABILITY_NAMED_IAM
             --parameters $STACKPARAMETERS
             --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild &&
           aws cloudformation wait stack-$STACKACTION-complete --stack-name $STACKPREFIX
-        fi
+
       - export CLIINSTANCE=$(aws ec2 describe-instances
                             --filters Name="tag:aws:cloud9:environment",Values=`aws cloudformation describe-stack-resource --stack-name $STACKPREFIX
                             --logical-resource-id SecHubWorkshopEnv --query StackResourceDetail.PhysicalResourceId --output text` Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text)
@@ -55,7 +52,6 @@ phases:
             --cloud-watch-output-config CloudWatchLogGroupName=$CWLGROUPNAME,CloudWatchOutputEnabled=true
             --parameters  commands=["$GITCMD && docker run -i --rm --cap-drop ALL --env AWS_DEFAULT_REGION
                                     -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro
-                                    -v /home/ec2-user/.aws:/home/custodian/.aws:ro
                                     --env AWS_STS_REGIONAL_ENDPOINTS=regional
                                     ${SECHUBWORKSHOP_CONTAINER}
                                     run -s /tmp -c
