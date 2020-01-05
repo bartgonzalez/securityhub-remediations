@@ -85,6 +85,8 @@ Metadata:
     config:
       ignore_checks:
       - E3002
+      - E3031
+      - E1029
 
 Resources:
   WorkshopVpc:
@@ -168,7 +170,7 @@ Resources:
       OwnerArn:
         Fn::If:
         - EventEngine
-        - !Sub 'arn:aws:sts::${AWS::AccountId}:assumed-role/TeamRole/MasterKey'
+        - !Sub 'arn:${AWS::Partition}:sts::${AWS::AccountId}:assumed-role/TeamRole/MasterKey'
         - Fn::If:
           - Cloud9OwnerArnEmpty
           - Ref: AWS::NoValue
@@ -247,21 +249,30 @@ Resources:
               - "lambda:CreateAlias"
               - "lambda:DeleteAlias"
               - "lambda:GetFunction"
+              - "lambda:GetPolicy"
               - "lambda:PutFunctionConcurrency"
               - "lambda:DeleteFunctionConcurrency"
               - "lambda:TagResource"
               - "lambda:UntagResource"
             Resource:
-              - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:custodian-*'
+              - !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:custodian-*'
           -
             Sid: "Events"
             Effect: "Allow"
             Action:
               - "events:PutRule"
               - "events:PutTargets"
+              - "events:RemoveTargets"
+              - "events:DeleteRule"
+            Resource:
+              - !Sub 'arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/custodian-*'
+          -
+            Sid: "Events"
+            Effect: "Allow"
+            Action:
+              - "securityhub:*ActionTarget*"
               - "events:Describe*"
               - "events:List*"
-              - "securityhub:*ActionTarget*"
               - "logs:FilterLogEvents"
               - "logs:GetLogEvents"
               - "xray:PutTraceSegments"
@@ -276,7 +287,7 @@ Resources:
             Action:
               - "iam:PassRole"
             Resource:
-              - !Sub 'arn:aws:iam::${AWS::AccountId}:role/CloudCustodian'
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CloudCustodian'
     Metadata:
       cfn_nag:
         rules_to_suppress:
@@ -395,8 +406,8 @@ Resources:
               - "sts:AssumeRole"
       Path: "/"
       ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-        - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy'
         - Ref: "TestTargetHighRiskPolicy"
       Tags:
         - Key: "CostCenter"
@@ -424,8 +435,8 @@ Resources:
               - "sts:AssumeRole"
       Path: "/"
       ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-        - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy'
         - Ref: "CliHostPolicy"
         - Ref: "CloudCustodianLambdaDeploymentManagedPolicy"
         - Ref: "CloudCustodianPolicyActions"
@@ -468,13 +479,13 @@ Resources:
             Effect: "Allow"
             Principal:
               AWS:
-                - !Sub 'arn:aws:iam::${AWS::AccountId}:role/CloudCustodian'
+                - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CloudCustodian'
             Action:
               - "sts:AssumeRole"
       Path: "/"
       ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/SecurityAudit"
-        - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/SecurityAudit'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy'
         - Ref: "CloudCustodianPolicyActions"
       Tags:
         - Key: "CostCenter"
@@ -497,8 +508,8 @@ Resources:
               - "sts:AssumeRole"
       Path: "/"
       ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/SecurityAudit"
-        - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/SecurityAudit'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy'
         - Ref: "CloudCustodianPolicyActions"
       Tags:
         - Key: "CostCenter"
@@ -525,8 +536,8 @@ Resources:
               - "sts:AssumeRole"
       Path: "/"
       ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/SecurityAudit"
-        - "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/SecurityAudit'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy'
         - Ref: "CloudCustodianLambdaDeploymentManagedPolicy"
         - Ref: "CloudCustodianPolicyActions"
       Tags:
