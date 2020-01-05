@@ -85,8 +85,6 @@ Metadata:
     config:
       ignore_checks:
       - E3002
-      - E3031
-      - E1029
 
 Resources:
   WorkshopVpc:
