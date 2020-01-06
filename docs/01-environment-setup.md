@@ -51,7 +51,7 @@ To Get started with this workshop as part of the an AWS Event where Event Engine
 7.  Next step is to pull down the latest version of the Cloud Custodian docker container image and setup the repeative part of the command line
 
         export SECHUBWORKSHOP_CONTAINER=cloudcustodian/c7n
-        export CLOUDCUSTODIANDOCKERCMD="docker run -it --rm --cap-drop ALL --env AWS_DEFAULT_REGION -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro ${SECHUBWORKSHOP_CONTAINER} run --cache-period 0 -s /tmp -c"
+        export CLOUDCUSTODIANDOCKERCMD="docker run -it --rm --cap-drop ALL -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro ${SECHUBWORKSHOP_CONTAINER} run --cache-period 0 -s /tmp -c"
         docker pull ${SECHUBWORKSHOP_CONTAINER}
         TOKEN=$(curl --silent -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
         export AWS_DEFAULT_REGION=$(curl --silent -H "X-aws-ec2-metadata-token: $TOKEN"  http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
