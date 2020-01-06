@@ -41,7 +41,7 @@ phases:
         if expr "${STACKACTION}" : "create" >/dev/null;
         then
           aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $CLIINSTANCE && sleep 220;
-          export GITCMD="git clone --single-branch --branch eventengineenablement https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations"
+          export GITCMD="git clone --single-branch --branch master https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations"
         else
           export GITCMD="cd securityhub-remediations && git pull"
         fi
