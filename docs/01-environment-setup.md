@@ -29,11 +29,6 @@ To Get started with this workshop as part of the an AWS Event where Event Engine
 9. On the "Review" page, click the checkbox to the left of "I acknowledge that AWS Cloudformation might create IAM resources with custom names", as it will.
 9. Click "Create Stack"
 9. Wait until the stack if finished creating before starting the next step as the Cloud9 environment needs to be enabled before it will work correctly
-10. Assign an IAM Instance Profile to the ec2 instance for the Cloud9 environment
-
-        aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $(aws ec2 describe-instances --filters Name=tag:Name,Values="aws-cloud9-SecHubWorkshopEnv-*" Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text)
-
-11.  Verify that the output from the prior command contained "State: associating"
 
 ## Manual Setup Steps
 1.
