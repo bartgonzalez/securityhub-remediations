@@ -337,6 +337,8 @@ Resources:
               - "ec2:TerminateInstances"
               - "config:PutEvaluations"
               - "s3:PutBucketTagging"
+              - "s3:PutBucketLogging"
+              - "s3:PutBucketVersioning"
               - "s3:PutBucketPolicy"
               - "s3:DeleteBucket*"
               - "tag:TagResources"
@@ -371,7 +373,6 @@ Resources:
               - "autoscaling:*Standby"
               - "kinesis:*Stream"
               - "kinesisanalytics:DeleteApplication"
-              - "config:PutEvaluations"
             Resource: "*"
           -
             Sid: "CCSecurityHubActions"
