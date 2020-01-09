@@ -265,6 +265,14 @@ Resources:
             Resource:
               - !Sub 'arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/custodian-*'
           -
+            Sid: "PutConfigRules"
+            Effect: "Allow"
+            Action:
+              - "config:PutConfigRule"
+              - "config:DeleteConfigRule"
+              - "config:DeleteEvaluationResults"
+            Resource: "*"
+          -
             Sid: "Misc"
             Effect: "Allow"
             Action:
@@ -363,6 +371,7 @@ Resources:
               - "autoscaling:*Standby"
               - "kinesis:*Stream"
               - "kinesisanalytics:DeleteApplication"
+              - "config:PutEvaluations"
             Resource: "*"
           -
             Sid: "CCSecurityHubActions"
