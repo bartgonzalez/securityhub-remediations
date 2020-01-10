@@ -85,7 +85,6 @@ Metadata:
     config:
       ignore_checks:
       - E3002
-      - E0000
 
 Resources:
   WorkshopVpc:
@@ -179,9 +178,6 @@ Resources:
         - CreateVPC
         - !Ref "WorkshopSubnet"
         - Ref: AWS::NoValue
-      Tags:
-        - Key: "CostCenter"
-          Value: !Ref "CostCenter"
 
   TestTargetHighRiskPolicy:
     Type: AWS::IAM::ManagedPolicy
