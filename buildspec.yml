@@ -59,7 +59,7 @@ phases:
                                     -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro
                                     --env AWS_STS_REGIONAL_ENDPOINTS
                                     ${SECHUBWORKSHOP_CONTAINER}
-                                    run -s /tmp -c
+                                    run -s /tmp --cache-period 0 -c
                                     securityhub-remediations/module1/force-vulnerability-finding.yml
                                     securityhub-remediations/module3/ec2-sechub-custom-actions.yml
                                     securityhub-remediations/module2/ec2-sechub-remediate-severity-with-findings.yml
