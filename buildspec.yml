@@ -37,14 +37,14 @@ phases:
         then
           exit 1
         fi
-      - |
-        if expr "${STACKACTION}" : "create" >/dev/null;
-        then
-          aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $CLIINSTANCE && sleep 220;
-          export GITCMD="git clone --single-branch --branch master https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations"
-        else
-          export GITCMD="cd securityhub-remediations && git pull"
-        fi
+      # - |
+      #  if expr "${STACKACTION}" : "create" >/dev/null;
+      #  then
+      - aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $CLIINSTANCE && sleep 220;
+      - export GITCMD="git clone --single-branch --branch master https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations"
+      #  else
+      #    export GITCMD="cd securityhub-remediations && git pull"
+      #  fi
       - export COMMANDID=$(aws ssm send-command --document-name AWS-RunShellScript
             --targets Key=instanceids,Values=$CLIINSTANCE --comment "CodeBuild Test $CODEBUILD_BUILD_NUMBER"
             --cloud-watch-output-config CloudWatchLogGroupName=$CWLGROUPNAME,CloudWatchOutputEnabled=true
