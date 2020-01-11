@@ -1,0 +1,36 @@
+policies:
+  - name: s3-access-logging-remediation
+    description: Remediate S3 bucket logging which does not conform to expected pattern
+    resource: s3
+    #    mode:
+    #  type: config-rule
+    #  role: CloudCustodian
+    #  memory: 128
+    #      tags:
+    #    CostCenter: SecurityHubWorkshop
+    #    CreatedBy: CloudCustodian
+    filters:
+      - "tag:CustodianTest": present
+      - or:
+        - type: value
+          key: Logging.TargetBucket
+          value: "example--{account}-access-logs-{region}"
+          op: not-equal
+        - type: value
+          key: Logging.TargetPrefix
+          value: "{source_bucket_name}"
+          op: not-equal
+    actions:
+        # Need https://github.com/cloud-custodian/cloud-custodian/pull/5206 merged and deployed before the following will work to override existing bucket logging
+      - type: toggle-logging
+        target_bucket: "el-usaa-{account}-access-logs-{region}"
+        target_prefix: "{source_bucket_name}"
+      - type: post-finding
+        severity_normalized: 30
+        types:
+          - "Software and Configuration Checks/AWS Security Best Practices"
+        recommendation: "Investigate why the standard was not followed"
+        recommendation_url: "https://wiki.example.com/policies/s3-access-logging.html"
+        criticality: 50
+        confidence: 100
+        compliance_status: FAILED

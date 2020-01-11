@@ -1,0 +1,32 @@
+policies:
+  - name: vpc-flowlogs-loggroup
+    description: Detect if VPC Flow Logs don't follow standard
+    resource: vpc
+    mode:
+      type: config-rule
+      role: CloudCustodian
+      memory: 128
+      tags:
+        CostCenter: SecurityHubWorkshop
+        CreatedBy: CloudCustodian
+    filters:
+      - not:
+          - type: flow-logs
+            deliver-status: success
+            destination-type: cloud-watch-logs
+            enabled: true
+            log-group: VpcFlowLogs
+            op: equal
+            set-op: or
+            status: active
+            traffic-type: all
+    actions:
+    - type: post-finding
+      severity_normalized: 30
+      types:
+        - "Software and Configuration Checks/AWS Security Best Practices"
+      recommendation: "Open a ticket to the Network Team "
+      recommendation_url: "https://wiki.example.com/policies/vpc-flow-logs.html"
+      criticality: 50
+      confidence: 100
+      compliance_status: FAILED
