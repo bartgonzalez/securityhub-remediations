@@ -261,6 +261,8 @@
       
         
       
+        
+      
     </ul>
   </div>
 </nav>
@@ -366,37 +368,12 @@
     
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
+      
     
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Module 2: GuardDuty DNS Event on EC2 Instance
-      </label>
     
     <a href="./" title="Module 2: GuardDuty DNS Event on EC2 Instance" class="md-nav__link md-nav__link--active">
       Module 2: GuardDuty DNS Event on EC2 Instance
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#module-2-automated-remediations-guardduty-dns-event-on-ec2-instance" class="md-nav__link">
-    Module 2 - Automated Remediations - GuardDuty DNS Event on EC2 Instance
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
     
   </li>
 
@@ -455,6 +432,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../07-cleanup/" title="Module 7: Cleanup of resources" class="md-nav__link">
+      Module 7: Cleanup of resources
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="../contribute/" title="Contributing" class="md-nav__link">
       Contributing
     </a>
@@ -487,22 +476,8 @@
 <nav class="md-nav md-nav--secondary">
   
   
+    
   
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#module-2-automated-remediations-guardduty-dns-event-on-ec2-instance" class="md-nav__link">
-    Module 2 - Automated Remediations - GuardDuty DNS Event on EC2 Instance
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
   
 </nav>
                   </div>
@@ -517,9 +492,7 @@
                   <a href="https://github.com/FireballDWF/securityhub-remediations/edit/master/docs/02-guardduty-dns-event.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Module 2: GuardDuty DNS Event on EC2 Instance</h1>
-                
-                <h2 id="module-2-automated-remediations-guardduty-dns-event-on-ec2-instance">Module 2 - Automated Remediations - GuardDuty DNS Event on EC2 Instance</h2>
+                <h1 id="module-2-automated-remediations-guardduty-dns-event-on-ec2-instance">Module 2 - Automated Remediations - GuardDuty DNS Event on EC2 Instance</h1>
 <ol>
 <li>
 <p>Run the following command which runs a policy named <a href="https://github.com/FireballDWF/securityhub-remediations/blob/master/module2/ec2-sechub-remediate-severity-with-findings.yml">ec2-sechub-remediate-severity-with-findings</a> which instructs Cloud Custodian to dynamically generate and deploy a lambda, which will be invoked when <a href="https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cloudwatch-events.html">SecurityHub generates a Cloudwatch Event</a> when sent a finding. In this module, the finding will be triggered when GuardDuty generates a finding, and the severity of the is greater than or equal to 31, and the EC2 instance has any vulnerability previously reported to SecurityHub</p>
@@ -530,7 +503,7 @@
 </li>
 <li>
 <p>Next run the following command which leverages <a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/execute-remote-commands.html">Systems Manager's Run Command</a> to run an "nslookup" command on the ec2 instance tag:Name RemediationTestTarget where it's looking up a dns name which <a href="https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_backdoor.html#backdoor7">GuardDuty will detect as Command and Control activity</a></p>
-<div class="codehilite"><pre><span></span><span class="err">aws ssm send-command --document-name AWS-RunShellScript --parameters commands=[&quot;nslookup guarddutyc2activityb.com&quot;] --targets &quot;Key=tag:Name,Values=RemediationTestTarget&quot; --comment &quot;Force GuardDutyFinding&quot; --cloud-watch-output-config CloudWatchLogGroupName=/aws/ssm/AWS-RunShellScript,CloudWatchOutputEnabled=true</span>
+<div class="codehilite"><pre><span></span><span class="err">aws ssm send-command --document-name AWS-RunShellScript --parameters commands=[&quot;nslookup guarddutyc2activityb.com&quot;] --targets &quot;Key=tag:Name,Values=RemediationTestTarget&quot; --comment &quot;Force GuardDutyFinding&quot; --cloud-watch-output-config CloudWatchLogGroupName=/workshop/SecurityHubRemediationsWorkshop,CloudWatchOutputEnabled=true</span>
 </pre></div>
 
 

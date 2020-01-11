@@ -261,6 +261,8 @@
       
         
       
+        
+      
     </ul>
   </div>
 </nav>
@@ -473,6 +475,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../07-cleanup/" title="Module 7: Cleanup of resources" class="md-nav__link">
+      Module 7: Cleanup of resources
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="../contribute/" title="Contributing" class="md-nav__link">
       Contributing
     </a>
@@ -565,7 +579,7 @@
 <ol>
 <li>In order to complete this workshop, you'll need a valid, usable AWS Account. Use a personal account or create a new AWS account to ensure you have the necessary access and that you do not accidentally modify corporate resources. Do not use an AWS account from the company you work for unless you have explicit approval to conduct security related training exercises in it. We strongly recommend that you use a non-production AWS account for this workshop such as a training, sandbox or personal account. Attempts by multiple participants to use the same account for this workshop will fail, due to the deployment of Named IAM Roles and Users.</li>
 <li>You will incur charges for the AWS resources used in this workshop.  The charges for some of the resources may be covered through the <a href="https://aws.amazon.com/free/">AWS Free Tier</a>. The demo uses free tier choices wherever possible.</li>
-<li>You must run this workshop in a region support by <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#cloud9_region">AWS Cloud9</a></li>
+<li>You must run this workshop in a region support by <a href="https://docs.aws.amazon.com/general/latest/gr/cloud9.html#cloud9_region">AWS Cloud9</a></li>
 <li>If you choose to use an existing VPC, it needs to have connectivity thru an IGW to reach AWS public endpoints as some of the services used do not yet support VPC Endpoints.</li>
 <li>
 <p>Now we need to download a copy of the CloudFormation template for this Workshop.  If you don't have the program wget, use any other method you are comfortable with, such as curl or a browser.</p>
@@ -585,15 +599,14 @@
 <li>On the "Configure stack options" page, Click the "Next" button.</li>
 <li>On the "Review" page, click the checkbox to the left of "I acknowledge that AWS Cloudformation might create IAM resources with custom names", as it will.</li>
 <li>Click "Create Stack"</li>
-<li>Wait until the stack if finished creating before starting the next section, as the Cloud9 environment needs to be enabled before you can follow the next steps.</li>
+<li>Wait until the stack if finished creating before starting the next step as the Cloud9 environment needs to be enabled before it will work correctly</li>
 </ol>
 <h2 id="manual-setup-steps">Manual Setup Steps</h2>
+<p>1.
+2.  Open the Cloud9 IDE which provides the ability to review files and execute commands in a browser based terminal window.  Starting from the main AWS Management Console, within the "Find Services" textbox, type "Cloud9" then hit Enter.
+2.  Now click the "Open IDE" button.
+3.  In the bottom part of the browser tab which opens up, look for a tab with a label starting with "bash", where the window contents contain "~/environment $".  This is the browser based terminal session you'll use for the rest of the workshop for any command line steps.</p>
 <ol>
-<li>Open the Cloud9 IDE which provides the ability to review files and execute commands in a browser based terminal window.  Starting from the main AWS Management Console, within the "Find Services" textbox, type "Cloud9" then hit Enter.</li>
-<li>Now click the "Open IDE" button.</li>
-<li>
-<p>In the bottom part of the browser tab which opens up, look for a tab with a label starting with "bash", where the window contents contain "~/environment $".  This is the browser based terminal session you'll use for the rest of the workshop for any command line steps.</p>
-</li>
 <li>
 <p>Run the following command to enable SecurityHub in the account, unless you are using your own account and know that it's already enabled. If you have full unresticted Admin Access, and get an error, then the most likely reason is that it is already enabled.</p>
 <div class="codehilite"><pre><span></span><span class="err">aws securityhub enable-security-hub</span>
@@ -610,7 +623,7 @@
 </li>
 <li>
 <p>The next step is to get a copy of the files required for this workshop by cloning the workshop's github repo specifing the eventengine branch.</p>
-<div class="codehilite"><pre><span></span><span class="err">git clone --single-branch --branch eventengineenablement https://github.com/FireballDWF/securityhub-remediations.git &amp;&amp; cd securityhub-remediations</span>
+<div class="codehilite"><pre><span></span><span class="err">git clone --single-branch --branch master https://github.com/FireballDWF/securityhub-remediations.git &amp;&amp; cd securityhub-remediations</span>
 </pre></div>
 
 
@@ -620,6 +633,8 @@
 <div class="codehilite"><pre><span></span>export SECHUBWORKSHOP_CONTAINER=cloudcustodian/c7n
 export CLOUDCUSTODIANDOCKERCMD=&quot;docker run -it --rm --cap-drop ALL -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro <span class="cp">${</span><span class="n">SECHUBWORKSHOP_CONTAINER</span><span class="cp">}</span> run --cache-period 0 -s /tmp -c&quot;
 docker pull <span class="cp">${</span><span class="n">SECHUBWORKSHOP_CONTAINER</span><span class="cp">}</span>
+TOKEN=$(curl --silent -X PUT &quot;http://169.254.169.254/latest/api/token&quot; -H &quot;X-aws-ec2-metadata-token-ttl-seconds: 21600&quot;)
+export AWS_DEFAULT_REGION=$(curl --silent -H &quot;X-aws-ec2-metadata-token: <span class="nv">$TOKEN</span>&quot;  http://169.254.169.254/latest/meta-data/placement/availability-zone | sed &#39;s/\(.*\)[a-z]/\1/&#39;)
 </pre></div>
 
 
