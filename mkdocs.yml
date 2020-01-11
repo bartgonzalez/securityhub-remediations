@@ -44,13 +44,13 @@ markdown_extensions:
 
 # Navigation
 nav:
-  - Overview: 'index.md'
+  - 'Overview': 'index.md'
   - 'Module 1: Environment Build': '01-environment-setup.md'
   - 'Module 2: GuardDuty DNS Event on EC2 Instance': '02-guardduty-dns-event.md'
   - 'Module 3: Security Hub Custom Actions': '03-securityhub-custom-actions.md'
   - 'Module 4: Vulnerability Event on EC2 Instance with Very Risky Configuration': '04-ec2-instance-high-risk-config.md'
   - 'Module 5: GuardDuty Event on IAMUser': '05-guardduty-iam-user.md'
   - 'Module 6: Remediate an Public EBS-Snapshot': '06-ebs-snapshot-public.md'
-  - 'Module 7: Cleanup of resources: '07-cleanup.md'
+  - 'Module 7: Cleanup of resources': '07-cleanup.md'
   - Contributing: 'contribute.md'
   - License: 'license.md'
