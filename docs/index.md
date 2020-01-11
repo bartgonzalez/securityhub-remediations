@@ -33,7 +33,7 @@ The cloudformation in this workshop sets up the following:
 As part of the Workshop, Security Hub and Guard Duty will be enabled.
 
 ## Presentation deck
-[Workshop Presentation Deck](../presentation/Security-Hub-Automated-Remediations-Workshop_DavidFiliatrault.pptx)
+[Workshop Presentation Deck](./Security-Hub-Automated-Remediations-Workshop_DavidFiliatrault.pptx)
 
 # Modules
 
