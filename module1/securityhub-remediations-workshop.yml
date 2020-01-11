@@ -25,7 +25,7 @@ Parameters:
     Type: 'String'
     Description: "Leave this value empty unless you have decided to go off the script of this Workshop. This parameter can use used to specifically populated the arn of the AWS Console role/user that will use the Cloud9 Environment.  If not populated, will result it being owned by the same user/role invoking the cloudformation, unless EventEngine=True.  If invoking from a command line, this parameter must be specified to be the Console user that with use the Cloud9 environment"
     Default: ""
-    #AllowedPattern: "^arn:aws:(iam|sts)::\d+:(root|(user\/[\w+=/:,.@-]{1,64}|federated-user\/[\w+=/:,.@-]{2,32}|assumed-role\/[\w+=/:,.@-]{1,64}\/[\w+=/:,.@-]{1,64}))$"
+    #AllowedPattern: ^arn:aws:(iam|sts)::\d+:(root|(user\/[\w+=/:,.@-]{1,64}|federated-user\/[\w+=/:,.@-]{2,32}|assumed-role\/[\w+=/:,.@-]{1,64}\/[\w+=/:,.@-]{1,64}))$
   Cloud9InstanceType:
     Type: 'String'
     Default: 't3.micro'

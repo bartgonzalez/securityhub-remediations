@@ -51,10 +51,8 @@ To Get started with this workshop as part of the an AWS Event where Event Engine
 7.  Next step is to pull down the latest version of the Cloud Custodian docker container image and setup the repeative part of the command line
 
         export SECHUBWORKSHOP_CONTAINER=cloudcustodian/c7n
-        export CLOUDCUSTODIANDOCKERCMD="docker run -it --rm --cap-drop ALL -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro ${SECHUBWORKSHOP_CONTAINER} run --cache-period 0 -s /tmp -c"
         docker pull ${SECHUBWORKSHOP_CONTAINER}
-        TOKEN=$(curl --silent -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
-        export AWS_DEFAULT_REGION=$(curl --silent -H "X-aws-ec2-metadata-token: $TOKEN"  http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
+        export CLOUDCUSTODIANDOCKERCMD="docker run -it --rm --cap-drop ALL -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro ${SECHUBWORKSHOP_CONTAINER} run --cache-period 0 -s /tmp -c"
 
 8.  This step tests the environment by invoking a Cloud Custodian Policy which reports that an ec2 instance has a vulnerability.
 
@@ -74,7 +72,7 @@ Here is a breakdown of the command you just ran:
 | --rm | [clean up docker container when container exits](https://docs.docker.com/engine/reference/run/#clean-up----rm) |
 | --cap-drop ALL | Drop all Linux kernel capabilities as recommended in Rule #3 of the [Docker Security Cheat Sheet](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Docker_Security_Cheat_Sheet.md) |
 | -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro|map the files for the workshop into the container so the cloud custodian policies are available insider the container. volume is mapped in ReadOnly mode |
-| -v /home/ec2-user/.aws:/home/custodian/.aws:ro | maps the [aws cli configuration files](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) into the container in read-only mode.  Cloud Custodian uses the same configuration files, as both use the [boto3 Python SDK](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) |
+| -v /home/ec2-user/.aws:/home/custodian/.aws:ro | maps the [aws cli configuration files](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) into the container in read-only mode.  Cloud Custodian uses the same configuration files, as both use the [boto3 Python SDK](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) and sets the region |
 | ${SECHUBWORKSHOP_CONTAINER} | evaluates to cloudcustodian/c7n which is the docker container image which is downloaded from https://hub.docker.com/r/cloudcustodian/c7n |
 | run | instructs Cloud Custodian to run a policy. This is the first part of the command line which is passed to CloudCustodian |
 | --cache-period 0 | disables cloud custodian's caching of api call results |
