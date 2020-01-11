@@ -45,3 +45,4 @@ This workshop is broken up into the following modules below:
 4. [Vulnerability Event on EC2 Instance with Very Risky Configuration](./04-ec2-instance-high-risk-config.md)
 5. [GuardDuty Event on IAMUser](./05-guardduty-iam-user.md)
 6. [Remediate an Public EBS-Snapshot](./06-ebs-snapshot-public.md)
+7. [Cleanup of Resources -- not needed using an AWS Event provided account](./07-cleanup.md)
