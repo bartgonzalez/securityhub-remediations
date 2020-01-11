@@ -31,8 +31,7 @@ To Get started with this workshop as part of the an AWS Event where Event Engine
 9. Wait until the stack if finished creating before starting the next step as the Cloud9 environment needs to be enabled before it will work correctly
 
 ## Manual Setup Steps
-1.
-2.  Open the Cloud9 IDE which provides the ability to review files and execute commands in a browser based terminal window.  Starting from the main AWS Management Console, within the "Find Services" textbox, type "Cloud9" then hit Enter.
+1.  Open the Cloud9 IDE which provides the ability to review files and execute commands in a browser based terminal window.  Starting from the main AWS Management Console, within the "Find Services" textbox, type "Cloud9" then hit Enter.
 2.  Now click the "Open IDE" button.
 3.  In the bottom part of the browser tab which opens up, look for a tab with a label starting with "bash", where the window contents contain "~/environment $".  This is the browser based terminal session you'll use for the rest of the workshop for any command line steps.
 
