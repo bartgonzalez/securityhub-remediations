@@ -8,7 +8,7 @@ However, if you used your own account, then follow these steps to cleanup your a
         wget https://raw.githubusercontent.com/cloud-custodian/cloud-custodian/master/tools/ops/mugc.py
         docker run -it --rm --cap-drop ALL -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro --entrypoint /usr/local/bin/python ${SECHUBWORKSHOP_CONTAINER} securityhub-remediations/mugc.py --present -c  securityhub-remediations/module3/ec2-sechub-custom-actions.yml
 
-2. Run the following commands.  If you get errors, then it could be that [[cleanup of custom actions was added to the mugc.py]](https://github.com/cloud-custodian/cloud-custodian/issues/4884)
+2. Run the following commands.  If you get errors, then it could be that [cleanup of custom actions was added to the mugc.py](https://github.com/cloud-custodian/cloud-custodian/issues/4884)
 
         ACCOUNTID=$(aws sts get-caller-identity --query Account --output text)
         aws securityhub delete-action-target --action-target-arn arn:aws:securityhub:${AWS_DEFAULT_REGION}:${ACCOUNTID}:action/custom/DenySnapStop
