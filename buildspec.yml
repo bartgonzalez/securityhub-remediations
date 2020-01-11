@@ -15,8 +15,8 @@ phases:
   pre_build:
     commands:
       # - echo Entered the pre_build phase...
-      - TOKEN=$(curl --silent -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
-      - export AWS_DEFAULT_REGION=$(curl --silent -H "X-aws-ec2-metadata-token: $TOKEN"  http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
+      #- TOKEN=$(curl --silent -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+      #- export AWS_DEFAULT_REGION=$(curl --silent -H "X-aws-ec2-metadata-token: $TOKEN"  http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
       # - echo $STACKACTION
     finally:
       #- echo This always runs even if the login command fails

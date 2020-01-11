@@ -3,8 +3,11 @@ policies:
     description: post findings if snapshot shared outside of org which includes if public
     resource: ebs-snapshot
     mode:
-      type: periodic
-      schedule: "rate(5 minutes)"
+      type: cloudtrail
+      events:
+        - source: ec2.amazonaws.com
+          event: ModifySnapshotAttribute
+          ids: "requestParameters.SnapshotId"
       role: arn:aws:iam::{account_id}:role/CloudCustodian
       memory: 128
       tags:
@@ -15,11 +18,44 @@ policies:
         whitelist_orgids:
           - "o-ypoj932199"
     actions:
-    - type: post-finding
-      severity_normalized: 70
-      types:
-        - "Software and Configuration Checks/AWS Security Best Practices"
-      recommendation: "Delete Snapshot or at least remove public access or any access outside your org"
-      recommendation_url: "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-modifying-snapshot-permissions.html"
-      confidence: 100
-      compliance_status: FAILED
+      - type: post-finding
+        severity_normalized: 70
+        types:
+          - "Software and Configuration Checks/AWS Security Best Practices"
+        recommendation: "Delete Snapshot or at least remove public access or any access outside your org"
+        recommendation_url: "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-modifying-snapshot-permissions.html"
+        confidence: 100
+        compliance_status: FAILED
+
+  - name: post-ebs-snapshot-public-passing
+    description: post findings if snapshot shared outside of org which includes if public
+    resource: ebs-snapshot
+    mode:
+      type: cloudtrail
+      events:
+        - source: ec2.amazonaws.com
+          event: ModifySnapshotAttribute
+          ids: "requestParameters.SnapshotId"
+      role: arn:aws:iam::{account_id}:role/CloudCustodian
+      memory: 128
+      tags:
+        CostCenter: SecurityHubWorkshop
+        CreatedBy: CloudCustodian
+    filters:
+      - "tag:c7n:FindingId": present
+      - not:
+        - type: cross-account
+          whitelist_orgids:
+            - "o-ypoj932199"
+    actions:
+      - type: post-finding
+        severity_normalized: 0
+        types:
+          - "Software and Configuration Checks/AWS Security Best Practices"
+        recommendation: ""
+        recommendation_url: ""
+        confidence: 100
+        compliance_status: PASSED
+      - type: remove-tag
+        tags:
+          - "c7n:FindingId"
