@@ -1,6 +1,6 @@
 # Module 7 - Cleanup
 
-If you conducted this workshop with an account provided by an AWS Event, then cleanup will be handled for you by the presentor.
+If you conducted this workshop with an account provided by an AWS Event, then cleanup will be handled for you by the presentor, thus there is no remaining action expected of you other than completing the workshop evaluation.
 However, if you used your own account, then follow these steps to cleanup your account.
 
 1. Delete the Cloudwatch Event rules and lambdas deployed by Cloud Custodian by running the following command from the Cloud9 IDE's terminal prompt
