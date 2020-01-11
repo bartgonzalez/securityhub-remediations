@@ -61,8 +61,8 @@ phases:
                                     ${SECHUBWORKSHOP_CONTAINER}
                                     run -s /tmp -c
                                     securityhub-remediations/module1/force-vulnerability-finding.yml
-                                    securityhub-remediations/module2/ec2-sechub-custom-actions.yml
-                                    securityhub-remediations/module3/ec2-sechub-remediate-severity-with-findings.yml
+                                    securityhub-remediations/module3/ec2-sechub-custom-actions.yml
+                                    securityhub-remediations/module2/ec2-sechub-remediate-severity-with-findings.yml
                                     securityhub-remediations/module4/ec2-public-ingress-hubfinding.yml
                                     securityhub-remediations/module5/iam-user-hubfinding-remediate-disable.yml
                                     securityhub-remediations/module6/post-ebs-snapshot-public.yml"],workingDirectory="/home/ec2-user/environment" --query Command.CommandId --output text)
