@@ -70,6 +70,17 @@ Parameters:
     Type: 'String'
     Default: 'SecurityHubWorkshop'
     Description: 'Value to use for the CostCenter tag applied to taggable resources created by this Workshop'
+  CreateLogGroups:
+    Type: 'String'
+    Description: 'Boolen value which Defaults to True, controls in LogGroups are created in the Cloudformation which simplifies cleanup'
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "True"
+  RetentionDays:
+    Type: 'Number'
+    Description: 'Number of days to retain log streams in the Cloudwatch LogGroups'
+    Default: 30
 
 Conditions:
   CreateCloud9Instance: !Equals [!Ref CreateCloud9Instance, "True"]
@@ -79,6 +90,7 @@ Conditions:
   EnableGuardDuty: !Equals [!Ref EnableGuardDuty, "True"]
   EnableSecurityHub: !Equals [!Ref EnableSecurityHub, "True"]
   CreateCloudCustodianMemberRole: !Equals [!Ref CreateCloudCustodianMemberRole, "True"]
+  CreateLogGroups: !Equals [!Ref CreateLogGroups, "True"]
 
 Metadata:
   cfn-lint:
@@ -644,3 +656,64 @@ Resources:
     Properties:
       Tags:
           CostCenter: !Ref "CostCenter"
+
+  LogGroupModule2d1:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/custodian-ec2-sechub-remediate-severity-with-findings
+      RetentionInDays: !Ref "RetentionDays"
+  LogGroupModule2d2:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /workshop/SecurityHubRemediationsWorkshop
+      RetentionInDays: !Ref "RetentionDays"
+  LogGroupModule3d1:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/custodian-DenySnapStop
+      RetentionInDays: !Ref "RetentionDays"
+  LogGroupModule3d2:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/custodian-DisableKey
+      RetentionInDays: !Ref "RetentionDays"
+  LogGroupModule3d3:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/custodian-Delete
+      RetentionInDays: !Ref "RetentionDays"
+  LogGroupModule3d4:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/custodian-PostOpsItem
+      RetentionInDays: !Ref "RetentionDays"
+  LogGroupModule3d5:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/custodian-RemPA
+      RetentionInDays: !Ref "RetentionDays"
+  LogGroupModule4d1:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/custodian-ec2-public-ingress-hubfinding
+      RetentionInDays: !Ref "RetentionDays"
+  LogGroupModule5d1:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/custodian-iam-user-hubfinding-remediate-disable
+      RetentionInDays: !Ref "RetentionDays"
+  LogGroupModule6d1:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/custodian-post-ebs-snapshot-public
+      RetentionInDays: !Ref "RetentionDays"
