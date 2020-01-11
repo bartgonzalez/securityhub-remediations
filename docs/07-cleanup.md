@@ -8,7 +8,7 @@ However, if you used your own account, then follow these steps to cleanup your a
         wget https://raw.githubusercontent.com/cloud-custodian/cloud-custodian/master/tools/ops/mugc.py
         docker run -it --rm --cap-drop ALL -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro --entrypoint /usr/local/bin/python ${SECHUBWORKSHOP_CONTAINER} securityhub-remediations/mugc.py --present -c  securityhub-remediations/module3/ec2-sechub-custom-actions.yml
 
-2. Run the following command, at least until https://github.com/cloud-custodian/cloud-custodian/issues/4884 is resolved
+2. Run the following commands.  If you get errors, then it could be that [[cleanup of custom actions was added to the mugc.py]](https://github.com/cloud-custodian/cloud-custodian/issues/4884)
 
         ACCOUNTID=$(aws sts get-caller-identity --query Account --output text)
         aws securityhub delete-action-target --action-target-arn arn:aws:securityhub:${AWS_DEFAULT_REGION}:${ACCOUNTID}:action/custom/DenySnapStop
@@ -17,7 +17,7 @@ However, if you used your own account, then follow these steps to cleanup your a
         aws securityhub delete-action-target --action-target-arn arn:aws:securityhub:${AWS_DEFAULT_REGION}:${ACCOUNTID}:action/custom/RemPA
         aws securityhub delete-action-target --action-target-arn arn:aws:securityhub:${AWS_DEFAULT_REGION}:${ACCOUNTID}:action/custom/Delete
 
-3. Delete Module 1 CloudFormation stacks (**SecurityHubRemediations**).
+3. Delete the CloudFormation stack created in module 1 (**SecurityHubRemediations**)
 	* Go to the <a href="https://console.aws.amazon.com/cloudformation/home#/stacks?filter=active">AWS CloudFormation</a> console.
 	* Select the appropriate stack.
 	* Select **Action**.
