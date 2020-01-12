@@ -49,6 +49,7 @@ policies:
             - "o-ypoj932199"
     actions:
       - type: post-finding
+        title: post-ebs-snapshot-public
         severity_normalized: 0
         types:
           - "Software and Configuration Checks/AWS Security Best Practices"
