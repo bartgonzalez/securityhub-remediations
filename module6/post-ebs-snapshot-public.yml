@@ -7,7 +7,7 @@ policies:
       events:
         - source: ec2.amazonaws.com
           event: ModifySnapshotAttribute
-          ids: "requestParameters.SnapshotId"
+          ids: "requestParameters.snapshotId"
       role: arn:aws:iam::{account_id}:role/CloudCustodian
       memory: 128
       tags:
@@ -35,7 +35,7 @@ policies:
       events:
         - source: ec2.amazonaws.com
           event: ModifySnapshotAttribute
-          ids: "requestParameters.SnapshotId"
+          ids: "requestParameters.snapshotId"
       role: arn:aws:iam::{account_id}:role/CloudCustodian
       memory: 128
       tags:

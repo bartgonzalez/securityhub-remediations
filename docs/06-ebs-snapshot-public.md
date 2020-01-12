@@ -2,28 +2,28 @@
 
 This module will show how to setup an automated detection of a EBS Snaspshot that has been made public, with a finding submitted to Security Hub, then use Security Hub Custom action to delete the snapshot.  Then we'll fully automate the remediation by changing the detection policy to perform the delete while still providing notification.
 
-1. Start by reviewing the file "post-ebs-snapshot-public.yml" using the Cloud9 IDE. Observe that the only action type is "post-finding". Also Observe that the following two lines instruct Cloud Custodian to deploy a CloudWatch rule which triggers on a regular schedule, configured to be every 5 minutes.
-
-        type: periodic
-        schedule: "rate(5 minutes)"
+1. Start by reviewing the file "post-ebs-snapshot-public.yml" using the Cloud9 IDE.
+   Observe that both polices in the file have a mode type of cloudtrail, with an event configuration filtering on eventname ModifySnapshotAttribute
 
 2. Then deploy the automated detection policy by running the following command:
 
         ${CLOUDCUSTODIANDOCKERCMD} securityhub-remediations/module6/post-ebs-snapshot-public.yml
 
+3. Skip to the next step if you are using an AWS Event provided account.  Only if you have ebs-encryption-by-default enabled, you will need to disabling it for purposes of this module, by runiing the following:
+
+        aws ec2 disable-ebs-encryption-by-default
+
 3. Next we need to create a new EBS volume, however no data will be stored in it, it will not be attached anywhere.  Note how the VolumeId is saved for the next step.
 
-        export WorkshopVolumeId=$(aws ec2 create-volume --availability-zone $(aws ec2 describe-availability-zones --query AvailabilityZones[0].ZoneName --output text) --size 1 --query VolumeId --output text)
-
+        export WorkshopVolumeId=$(aws ec2 create-volume --availability-zone $(aws ec2 describe-availability-zones --query AvailabilityZones[0].ZoneName --output text) --size 1 --tag-specifications  'ResourceType=volume,Tags=[{Key=CostCenter,Value=SecurityHubWorkshop},{Key=Name,Value=SecurityHubWorkshopModule6Volume}]' --no-encrypted --query VolumeId --output text)
 
 4. Then we Snapshot the volume just created, also saving the SnapshotId for a future step.
 
-        export WorkshopSnapshotId=$(aws ec2 create-snapshot --volume-id $WorkshopVolumeId --query SnapshotId --output text)
+        export WorkshopSnapshotId=$(aws ec2 create-snapshot --volume-id $WorkshopVolumeId --description 'Module6: Take a snapshot of a empty volume, then make it public, then remediate' --tag-specifications  'ResourceType=snapshot,Tags=[{Key=CostCenter,Value=SecurityHubWorkshop},{Key=Name,Value=SecurityHubWorkshopModule6Volume}]' --query SnapshotId --output text)
 
-5. This step makes the snapshot public.
+5. This step makes the snapshot public.  If it fails with 'An error occurred (OperationNotPermitted) when calling the ModifySnapshotAttribute operation: Encrypted snapshots cannot be shared publicly' then either you skipped step the step earlier to disable it, or someone/someprocess enabled it in the meantime.
 
         aws ec2 modify-snapshot-attribute --snapshot-id $WorkshopSnapshotId --attribute createVolumePermission --operation-type add --group-names all
-
 
 6. Now navigate to the Findings part of Security Hub's console.  Look for a finding who's title is the same as the policy name from step 1 then click it's checkbox.  If you don't see it, you may need to wait up to 5 minutes (remember the schedule based CloudWatch Rule from Step 1) for it to appear after refreshing the browser.
 7. Click the dropdown for Actions then select "Ebs-Snapshot Delete" (This custom action is one of the ones deployed in Module 2).
@@ -83,9 +83,14 @@ This module will show how to setup an automated detection of a EBS Snaspshot tha
 
         sleep 300 ; aws ec2 describe-snapshots --snapshot-ids $WorkshopSnapshotId
 
-20. For good hygene, delete the public snapshot manually.
+20. For good hygiene, delete the public snapshot and the volume manually.
 
-        aws ec2 delete-snapshots --snapshot-ids $WorkshopSnapshotId
+        aws ec2 delete-snapshot --snapshot-id $WorkshopSnapshotId
+        aws ec2 delete-volume --volume-id $WorkshopVolumeId
+
+21.  Only if not using an AWS Event supplied account, and you disabled the EBS encryption by default, then you should proceed with enabling it again by running the following command:
+
+        aws ec2 enable-ebs-encryption-by-default
 
 21. To learn more about the types of filters that can be added to any Cloud Custodian Policy, click [generic filters](https://cloudcustodian.io/docs/filters.html).
 22. To learn about the filters that can be applied to EBS Snapshots, run the following:
