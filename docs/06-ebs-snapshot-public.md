@@ -25,18 +25,26 @@ This module will show how to setup an automated detection of a EBS Snaspshot tha
 
         aws ec2 modify-snapshot-attribute --snapshot-id $WorkshopSnapshotId --attribute createVolumePermission --operation-type add --group-names all
 
-6. Now navigate to the Findings part of Security Hub's console.  Look for a finding who's title is the same as the policy name from step 1 then click it's checkbox.  If you don't see it, you may need to wait up to 5 minutes (remember the schedule based CloudWatch Rule from Step 1) for it to appear after refreshing the browser.
-7. Click the dropdown for Actions then select "Ebs-Snapshot Delete" (This custom action is one of the ones deployed in Module 2).
+6. Now navigate to the Findings part of Security Hub's console.
+   Look for a finding who's title is the same as the policy name from step 1, if you don't see it, you may need to wait, usually less than 20 seconds but sometimes up to 2 minutes.
+   Observe that the Status column for the finding is "FAILED".
+7. Manually remediate the Public Snapshot by running the following:
+
+        aws ec2 modify-snapshot-attribute --snapshot-id $WorkshopSnapshotId --attribute createVolumePermission --operation-type remove --group-names all
+
+8. After about 20 seconds, refresh the Security Hub's console, looking for the same finding's Status column value now be "PASSED", or refresh every 10-20 seconds until it does change.
+   The 2nd policy contained in the policy file deployed in this module detected that the snapshot was no longer public, so it invoked the action post-finding, setting the compliance status to PASSED and due to setting the finding's title to be the same as that of the policy that reported the failure, an update to the prior finding was performed, then the 2nd action was to remove the finding_id from the resource so that any future reoccurance of it being made public will be treated as a new finding.
+9. Now test a custom action by clicking the checkbox for the finding then click the dropdown for Actions then select "Ebs-Snapshot Delete" (This custom action is one of the ones deployed in Module 3).
 8. Confirm the snapshot got deleted by running:
 
         aws ec2 describe-snapshots --snapshot-ids $WorkshopSnapshotId
 
-    then confirming the response is similar to:
+   then confirming the response is similar to:
 
         An error occurred (InvalidSnapshot.NotFound) when calling the DescribeSnapshots operation: The snapshot 'snap-0643b6dcd0a6f01f0' does not exist.
 
-
-9. Now edit the file "post-ebs-snapshot-public.yml" by adding an action to delete the snapshot at time of initial detection, which transform the policy from a detective control to a remediation control.  Append the following line to the file, where the dash should be in column 5.
+9. Now edit the file "post-ebs-snapshot-public.yml" by adding an action to delete the snapshot at time of initial detection, which transform the policy from a detective control to a remediation control.
+   Insert the following line at line 29 and the dash should be in column 7.
 
         - type: delete
 
@@ -47,17 +55,17 @@ This module will show how to setup an automated detection of a EBS Snaspshot tha
 
 12. Run the following three commands:
 
-        export WorkshopSnapshotId=$(aws ec2 create-snapshot --volume-id $WorkshopVolumeId --query SnapshotId --output text)
+        export WorkshopSnapshotId=$(aws ec2 create-snapshot --volume-id $WorkshopVolumeId --description 'Module6: Take a snapshot of a empty volume, then make it public, then remediate' --tag-specifications  'ResourceType=snapshot,Tags=[{Key=CostCenter,Value=SecurityHubWorkshop},{Key=Name,Value=SecurityHubWorkshopModule6Volume}]' --query SnapshotId --output text)
         aws ec2 modify-snapshot-attribute --snapshot-id $WorkshopSnapshotId --attribute createVolumePermission --operation-type add --group-names all
         aws ec2 describe-snapshots --snapshot-ids $WorkshopSnapshotId
 
 13. Repeat running the last command, the describe-snapshots one, until either the InvalidSnapshot.NotFound error is received (which means success, move on the the next step)
-    or if after 5 minutes it still has not been deleted, the most likely cause is Step 9 did not get done correctly,
-    review the CloudWatch logs for the policy, or the file did not get saved (view the file from the terminal to see if it has the type: delete line), or the policy did not get redeployed in step 11.
+    or if after 5 minutes it still has not been deleted, the most likely cause is the step to add the delete action did not get done correctly or was not deployed.
+
 14. The remainder of this module shows you how to customize the automated remediation by adding an exception filter then provides information on more advanced filters.
     If you have a use case for publicly sharing a snapshot, a change to the policy could be made to filter for only those snapshots which do not have a specific value for a specific tag.
-    In this example we use the Tag key of "PublicIntent" and Tag value of "True".  Start by updating the filter section of the policy by inserting the following lines at line 13 or 16,
-    as long as it's within the filter section and doesn't overlap the existing filter, with the dash character at column 13.
+    In this example we use the Tag key of "PublicIntent" and Tag value of "True".  Start by updating the filter section of the policy by inserting the following lines at line 17,
+    as long as it's within the filter section and doesn't overlap the existing filter, with the dash character at column 7.
     The way to read the filter match the condition of not-equal when testing for Tag key of value.
     Thus resources which have this tag value will get filtered out aka excluded, thus the actions will not get invoked on those filtered out resources.
 
@@ -79,9 +87,9 @@ This module will show how to setup an automated detection of a EBS Snaspshot tha
 
         aws ec2 modify-snapshot-attribute --snapshot-id $WorkshopSnapshotId --attribute createVolumePermission --operation-type add --group-names all
 
-19. Run the following which waits for 5 minutes to then show the snapshot did not get deleted, a result of the exception filter.
+19. Run the following wait then show the snapshot did not get deleted, a result of the exception filter.
 
-        sleep 300 ; aws ec2 describe-snapshots --snapshot-ids $WorkshopSnapshotId
+        sleep 20 ; aws ec2 describe-snapshots --snapshot-ids $WorkshopSnapshotId
 
 20. For good hygiene, delete the public snapshot and the volume manually.
 
