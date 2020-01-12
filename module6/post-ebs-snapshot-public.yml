@@ -42,7 +42,7 @@ policies:
         CostCenter: SecurityHubWorkshop
         CreatedBy: CloudCustodian
     filters:
-      - "tag:c7n:FindingId": present
+      - "tag:c7n:FindingId:post-ebs-snapshot-public": present
       - not:
         - type: cross-account
           whitelist_orgids:
@@ -58,4 +58,4 @@ policies:
         compliance_status: PASSED
       - type: remove-tag
         tags:
-          - "c7n:FindingId"
+          - "c7n:FindingId:post-ebs-snapshot-public"
