@@ -26,6 +26,7 @@ policies:
         recommendation_url: "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-modifying-snapshot-permissions.html"
         confidence: 100
         compliance_status: FAILED
+      #- type: delete
 
   - name: post-ebs-snapshot-public-passing
     description: post findings if snapshot shared outside of org which includes if public
@@ -57,6 +58,8 @@ policies:
         recommendation_url: ""
         confidence: 100
         compliance_status: PASSED
+        #record_status: ARCHIVED
+
       - type: remove-tag
         tags:
           - "c7n:FindingId:post-ebs-snapshot-public"

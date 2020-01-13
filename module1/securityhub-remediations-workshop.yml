@@ -717,3 +717,9 @@ Resources:
     Properties:
       LogGroupName: /aws/lambda/custodian-post-ebs-snapshot-public
       RetentionInDays: !Ref "RetentionDays"
+  LogGroupModule6d2:
+    Condition: CreateLogGroups
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/custodian-post-ebs-snapshot-public-passing
+      RetentionInDays: !Ref "RetentionDays"

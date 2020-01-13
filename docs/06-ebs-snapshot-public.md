@@ -13,27 +13,41 @@ This module will show how to setup an automated detection of a EBS Snaspshot tha
 
         aws ec2 disable-ebs-encryption-by-default
 
-3. Next we need to create a new EBS volume, however no data will be stored in it, it will not be attached anywhere.  Note how the VolumeId is saved for the next step.
+4. Next we need to create a new EBS volume, however no data will be stored in it, it will not be attached anywhere.  Note how the VolumeId is saved for the next step.
 
         export WorkshopVolumeId=$(aws ec2 create-volume --availability-zone $(aws ec2 describe-availability-zones --query AvailabilityZones[0].ZoneName --output text) --size 1 --tag-specifications  'ResourceType=volume,Tags=[{Key=CostCenter,Value=SecurityHubWorkshop},{Key=Name,Value=SecurityHubWorkshopModule6Volume}]' --no-encrypted --query VolumeId --output text)
 
-4. Then we Snapshot the volume just created, also saving the SnapshotId for a future step.
+5. Then we Snapshot the volume just created, also saving the SnapshotId for a future step.
 
         export WorkshopSnapshotId=$(aws ec2 create-snapshot --volume-id $WorkshopVolumeId --description 'Module6: Take a snapshot of a empty volume, then make it public, then remediate' --tag-specifications  'ResourceType=snapshot,Tags=[{Key=CostCenter,Value=SecurityHubWorkshop},{Key=Name,Value=SecurityHubWorkshopModule6Volume}]' --query SnapshotId --output text)
 
-5. This step makes the snapshot public.  If it fails with 'An error occurred (OperationNotPermitted) when calling the ModifySnapshotAttribute operation: Encrypted snapshots cannot be shared publicly' then either you skipped step the step earlier to disable it, or someone/someprocess enabled it in the meantime.
+6. This step makes the snapshot public.  If it fails with 'An error occurred (OperationNotPermitted) when calling the ModifySnapshotAttribute operation: Encrypted snapshots cannot be shared publicly' then either you skipped step the step earlier to disable it, or someone/someprocess enabled it in the meantime.
 
         aws ec2 modify-snapshot-attribute --snapshot-id $WorkshopSnapshotId --attribute createVolumePermission --operation-type add --group-names all
 
-6. Now navigate to the Findings part of Security Hub's console.
+7. Now navigate to the Findings part of Security Hub's console.
    Look for a finding who's title is the same as the policy name from step 1, if you don't see it, you may need to wait, usually less than 20 seconds but sometimes up to 2 minutes.
    Observe that the Status column for the finding is "FAILED".
-7. Manually remediate the Public Snapshot by running the following:
+8. Manually remediate the Public Snapshot by running the following:
 
         aws ec2 modify-snapshot-attribute --snapshot-id $WorkshopSnapshotId --attribute createVolumePermission --operation-type remove --group-names all
 
-8. After about 20 seconds, refresh the Security Hub's console, looking for the same finding's Status column value now be "PASSED", or refresh every 10-20 seconds until it does change.
+9. After about 20 seconds, refresh the Security Hub's console, looking for the same finding's Status column value now be "PASSED", or refresh every 10-20 seconds until it does change.
    The 2nd policy contained in the policy file deployed in this module detected that the snapshot was no longer public, so it invoked the action post-finding, setting the compliance status to PASSED and due to setting the finding's title to be the same as that of the policy that reported the failure, an update to the prior finding was performed, then the 2nd action was to remove the finding_id from the resource so that any future reoccurance of it being made public will be treated as a new finding.
+10. Click the checkbox to the left of the Finding then click the Actions button and select "Archive".
+11. Next step is to configure the policy to after it auto-remediates the finding, to auto-archived the findiing.  Make this change by using the Cloud9 IDE to open "module6/post-ebs-snapshot-public.yml" then uncommenting line 61 by deleting the hash.
+11. Save the file in the IDE then run the following command which redeploys the policy:
+
+        ${CLOUDCUSTODIANDOCKERCMD} securityhub-remediations/module6/post-ebs-snapshot-public.yml
+
+12. Next run the following commands to make the snapshot public again to generate a finding, wait, then remediate the finding:
+
+        aws ec2 modify-snapshot-attribute --snapshot-id $WorkshopSnapshotId --attribute createVolumePermission --operation-type add --group-names all
+        sleep 10
+        aws ec2 modify-snapshot-attribute --snapshot-id $WorkshopSnapshotId --attribute createVolumePermission --operation-type remove --group-names all
+
+13. After about 20 seconds, refresh the Security Hub's console, and notice the finding does not even appear.
+    To see that it did in fact get created, click the X after the "Record state EQUALS ACTIVE" then it should appear.
 9. Now test a custom action by clicking the checkbox for the finding then click the dropdown for Actions then select "Ebs-Snapshot Delete" (This custom action is one of the ones deployed in Module 3).
 8. Confirm the snapshot got deleted by running:
 
@@ -44,12 +58,8 @@ This module will show how to setup an automated detection of a EBS Snaspshot tha
         An error occurred (InvalidSnapshot.NotFound) when calling the DescribeSnapshots operation: The snapshot 'snap-0643b6dcd0a6f01f0' does not exist.
 
 9. Now edit the file "post-ebs-snapshot-public.yml" by adding an action to delete the snapshot at time of initial detection, which transform the policy from a detective control to a remediation control.
-   Insert the following line at line 29 and the dash should be in column 7.
-
-        - type: delete
-
-10. Save the file in the IDE.
-11. Run the following command which redeploys the policy:
+   Uncomment line 29 by removing the single hash such that the dash should be in column 7.
+10. Save the file in the IDE then run the following command which redeploys the policy:
 
         ${CLOUDCUSTODIANDOCKERCMD} securityhub-remediations/module6/post-ebs-snapshot-public.yml
 
