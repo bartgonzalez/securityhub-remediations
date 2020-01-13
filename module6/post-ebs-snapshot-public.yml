@@ -58,7 +58,7 @@ policies:
         recommendation_url: ""
         confidence: 100
         compliance_status: PASSED
-        #record_status: ARCHIVED
+        #record_state: ARCHIVED
 
       - type: remove-tag
         tags:
