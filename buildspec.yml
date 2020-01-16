@@ -54,6 +54,7 @@ phases:
         fi
       # following line needed if image is on ECR
       - $(aws ecr get-login --no-include-email --region us-east-1)
+      - docker pull 369510138361.dkr.ecr.us-east-1.amazonaws.com/cloudcustodian:latest
       - export COMMANDID=$(aws ssm send-command --document-name AWS-RunShellScript
             --targets Key=instanceids,Values=$CLIINSTANCE --comment "CodeBuild Test $CODEBUILD_BUILD_NUMBER"
             --cloud-watch-output-config CloudWatchLogGroupName=$CWLGROUPNAME,CloudWatchOutputEnabled=true
