@@ -49,7 +49,7 @@ phases:
           export GITCMD="git clone --single-branch --branch master https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations"
         else
           export GITCMD="cd securityhub-remediations && git pull"
-        f
+        fi
       - export COMMANDID=$(aws ssm send-command --document-name AWS-RunShellScript
             --targets Key=instanceids,Values=$CLIINSTANCE --comment "CodeBuild Test $CODEBUILD_BUILD_NUMBER"
             --cloud-watch-output-config CloudWatchLogGroupName=$CWLGROUPNAME,CloudWatchOutputEnabled=true
