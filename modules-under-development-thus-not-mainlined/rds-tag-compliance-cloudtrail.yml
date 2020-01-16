@@ -1,0 +1,35 @@
+policies:
+  - name: mark-rds-tagcompliance-cloudtrail
+    resource: rds
+    description: |
+      Mark RDS instance if RequiredTags Absent
+    mode:
+      type: cloudtrail
+      role: "arn:aws:iam::{account_id}:role/CloudCustodian"
+      events:
+        - CreateDBInstance
+      execution-options:
+        metrics_enabled: false
+      memory: 128
+    filters:
+      - or:
+        - "tag:OwnerEmail": absent
+        - "tag:ProjectCode": absent
+        - "tag:CostCenter": absent
+        - "tag:Name": absent
+        - "tag:AppName": absent
+        - "tag:Component": absent
+        - and:
+          - "tag:AppId": absent
+          - "tag:AppID": absent
+    actions:
+      - type: auto-tag-user
+        tag: CreatorName
+      - type: post-finding
+        severity_normalized: 20
+        types:
+          - "Software and Configuration Checks/AWS Security Best Practices"
+        recommendation: "Follow Tag Compliance policy"
+        recommendation_url: "https://www.example.com/tagcompliance.html"
+        confidence: 100
+        compliance_status: FAILED
