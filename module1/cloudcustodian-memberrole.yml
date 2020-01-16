@@ -20,8 +20,6 @@ Metadata:
 
 Resources:
 
-
-
   CloudCustodianPolicyActions:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -34,6 +32,7 @@ Resources:
             Effect: "Allow"
             Action:
               - "ssm:SendCommand"
+              - "ssm:ListCommands"
               - "ssm:CreateOpsItem"
               - "iam:DeleteAccessKey"
               - "iam:UpdateAccessKey"
@@ -47,6 +46,7 @@ Resources:
               - "ec2:CreateSnapshot*"
               - "ec2:CreateTags"
               - "ec2:DeleteTags"
+              - "ec2:DeleteSecurityGroup"
               - "ec2:ModifyVpcAttribute"
               - "ec2:ModifyInstanceAttribute"
               - "ec2:AssociateIamInstanceProfile"
@@ -57,12 +57,15 @@ Resources:
               - "ec2:TerminateInstances"
               - "config:PutEvaluations"
               - "s3:PutBucketTagging"
+              - "s3:PutBucketLogging"
+              - "s3:PutBucketVersioning"
               - "s3:PutBucketPolicy"
               - "s3:DeleteBucket*"
               - "tag:TagResources"
               - "tag:UntagResources"
               - "lambda:TagResource"
               - "lambda:UntagResource"
+              - "lambda:DeleteFunction"
               - "elasticfilesystem:CreateTags"
               - "elasticfilesystem:DeleteTags"
               - "logs:TagLogGroup"
@@ -71,6 +74,25 @@ Resources:
               - "rds:Delete*"
               - "rds:CreateDBSnapshot"
               - "rds:Stop*"
+              - "elasticache:*Snapshot"
+              - "elasticache:DeleteCacheCluster"
+              - "dynamodb:DeleteTable"
+              - "dynamodb:TagResource"
+              - "dynamodb:UntagResource"
+              - "es:DeleteElasticsearchDomain"
+              - "es:*Tags"
+              - "elasticmapreduce:TerminateJobFlows"
+              - "elasticmapreduce:*Tags"
+              - "redshift:DeleteCluster"
+              - "redshift:*Tags"
+              - "autoscaling:DetachInstances"
+              - "autoscaling:*Tags"
+              - "autoscaling:*Processes"
+              - "autoscaling:Terminate*"
+              - "autoscaling:Set*"
+              - "autoscaling:*Standby"
+              - "kinesis:*Stream"
+              - "kinesisanalytics:DeleteApplication"
             Resource: "*"
           -
             Sid: "CCSecurityHubActions"
@@ -102,7 +124,7 @@ Resources:
             Effect: "Allow"
             Principal:
               AWS:
-                - !Sub 'arn:aws:iam::${MasterAccountId}:role/CloudCustodian'
+                - !Sub 'arn:aws:sts::${MasterAccountId}:assumed-role/CloudCustodian/custodian-*'
             Action:
               - "sts:AssumeRole"
       Path: "/"
