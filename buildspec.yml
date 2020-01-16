@@ -52,6 +52,8 @@ phases:
         else
           export GITCMD="cd securityhub-remediations && git pull"
         fi
+      # following line needed if image is on ECR
+      - $(aws ecr get-login --no-include-email --region us-east-1)
       - export COMMANDID=$(aws ssm send-command --document-name AWS-RunShellScript
             --targets Key=instanceids,Values=$CLIINSTANCE --comment "CodeBuild Test $CODEBUILD_BUILD_NUMBER"
             --cloud-watch-output-config CloudWatchLogGroupName=$CWLGROUPNAME,CloudWatchOutputEnabled=true
