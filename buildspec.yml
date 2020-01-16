@@ -3,8 +3,8 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      # python: 3.8
-      docker: 18
+      python: 3.8
+      # docker: 18
     commands:
       # - echo Entered the install phase...
       # - yum update -y
@@ -15,8 +15,6 @@ phases:
   pre_build:
     commands:
       # - echo Entered the pre_build phase...
-      #- TOKEN=$(curl --silent -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
-      #- export AWS_DEFAULT_REGION=$(curl --silent -H "X-aws-ec2-metadata-token: $TOKEN"  http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
       # - echo $STACKACTION
     finally:
       #- echo This always runs even if the login command fails
@@ -51,14 +49,13 @@ phases:
           export GITCMD="git clone --single-branch --branch master https://github.com/FireballDWF/securityhub-remediations.git && cd securityhub-remediations"
         else
           export GITCMD="cd securityhub-remediations && git pull"
-        fi
-      # following line needed if image is on ECR
-      - $(aws ecr get-login --no-include-email --region us-east-1)
-      - docker pull 369510138361.dkr.ecr.us-east-1.amazonaws.com/cloudcustodian:latest
+        f
       - export COMMANDID=$(aws ssm send-command --document-name AWS-RunShellScript
             --targets Key=instanceids,Values=$CLIINSTANCE --comment "CodeBuild Test $CODEBUILD_BUILD_NUMBER"
             --cloud-watch-output-config CloudWatchLogGroupName=$CWLGROUPNAME,CloudWatchOutputEnabled=true
-            --parameters  commands=["$GITCMD && docker run -i --rm --cap-drop ALL
+            --parameters  commands=["$GITCMD &&
+                                    $(aws ecr get-login --no-include-email --region $AWS_REGION) &&
+                                    docker run -i --rm --cap-drop ALL
                                     -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro
                                     --env AWS_STS_REGIONAL_ENDPOINTS
                                     ${SECHUBWORKSHOP_CONTAINER}
