@@ -5,7 +5,7 @@ policies:
     mode:
         type: hub-finding
         role: arn:aws:iam::{account_id}:role/CloudCustodian
-        # packages: [botocore, boto3, urllib3]
+        member-role: arn:aws:iam::{account_id}:role/CloudCustodianMember
         memory: 128
         concurrency: 1
         tags:
