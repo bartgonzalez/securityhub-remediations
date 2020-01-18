@@ -259,7 +259,6 @@ Resources:
               - "lambda:CreateAlias"
               - "lambda:DeleteAlias"
               - "lambda:GetFunction"
-              - "lambda:GetPolicy"
               - "lambda:PutFunctionConcurrency"
               - "lambda:DeleteFunctionConcurrency"
               - "lambda:TagResource"
@@ -285,19 +284,11 @@ Resources:
               - "config:DeleteEvaluationResults"
             Resource: "*"
           -
-            Sid: "Misc"
+            Sid: "ManagedCustom"
             Effect: "Allow"
             Action:
               - "securityhub:*ActionTarget*"
-              - "events:Describe*"
-              - "events:List*"
-              - "logs:FilterLogEvents"
-              - "logs:GetLogEvents"
-              - "xray:PutTraceSegments"
-              - "xray:PutTelemetryRecords"
-              - "xray:GetSamplingRules"
-              - "xray:GetSamplingTargets"
-              - "xray:GetSamplingStatisticSummaries"
+              - "securityhub:*Insight"
             Resource: "*"
           -
             Sid: "CCPassRole"
@@ -458,6 +449,7 @@ Resources:
         - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore'
         - !Sub 'arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy'
         - !Sub 'arn:${AWS::Partition}:iam::aws:policy/SecurityAudit'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/CloudWatchLogsReadOnlyAccess'
         - Ref: "CliHostPolicy"
         - Ref: "CloudCustodianLambdaDeploymentManagedPolicy"
         - Ref: "CloudCustodianPolicyActions"
