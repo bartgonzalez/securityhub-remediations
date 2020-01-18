@@ -394,6 +394,13 @@ Resources:
               - "ec2:DeleteNetworkInterface"
               - "ec2:CreateNetworkInterface"
             Resource: "*"
+          -
+            Sid: "AssumeMemberRole"
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Resource:
+              - !Sub 'arn:${AWS::Partition}:iam::*:role/CloudCustodianMember'
     Metadata:
       cfn_nag:
         rules_to_suppress:
