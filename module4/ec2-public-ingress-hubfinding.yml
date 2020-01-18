@@ -7,8 +7,8 @@ policies:
         role: arn:aws:iam::{account_id}:role/CloudCustodian
         member-role: arn:aws:iam::{account_id}:role/CloudCustodianMember
         memory: 128
-        #packages: [botocore, boto3, urllib3]
-        concurrency: 5
+        packages: [botocore, boto3]
+        concurrency: 1
         tags:
           CostCenter: SecurityHubWorkshop
           CreatedBy: CloudCustodian
@@ -37,10 +37,12 @@ policies:
           - s3:PutBucketWebsite
           - s3:PutReplicationConfiguration
           - s3:*
-
+      - type: value
+        key: tag:Name
+        value: RemediationTestTarget
     actions:
       # snapshot the disk for forensics
-      - type: snapshot
-        copy-tags: [Name]
+      #- type: snapshot
+      #  copy-tags: [Name]
       # Remove priviledges from the instance
       - type: set-instance-profile

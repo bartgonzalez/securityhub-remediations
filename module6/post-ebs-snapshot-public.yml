@@ -9,6 +9,7 @@ policies:
           event: ModifySnapshotAttribute
           ids: "requestParameters.snapshotId"
       role: arn:aws:iam::{account_id}:role/CloudCustodian
+      member-role: arn:aws:iam::{account_id}:role/CloudCustodianMember
       memory: 128
       tags:
         CostCenter: SecurityHubWorkshop
@@ -38,6 +39,7 @@ policies:
           event: ModifySnapshotAttribute
           ids: "requestParameters.snapshotId"
       role: arn:aws:iam::{account_id}:role/CloudCustodian
+      member-role: arn:aws:iam::{account_id}:role/CloudCustodianMember
       memory: 128
       tags:
         CostCenter: SecurityHubWorkshop
@@ -59,7 +61,6 @@ policies:
         confidence: 100
         compliance_status: PASSED
         #record_state: ARCHIVED
-
       - type: remove-tag
         tags:
           - "c7n:FindingId:post-ebs-snapshot-public"
