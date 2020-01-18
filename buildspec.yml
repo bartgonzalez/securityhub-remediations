@@ -15,7 +15,7 @@ phases:
   pre_build:
     commands:
       # - echo Entered the pre_build phase...
-      # - echo $STACKACTION
+      - echo $STACKACTION
     finally:
       #- echo This always runs even if the login command fails
   build:
@@ -24,11 +24,11 @@ phases:
       - |
         if [ ${STACKACTION} == 'create' ] || [ ${STACKACTION} == 'update' ]
         then
-          aws cloudformation $STACKACTION-stack --template-body file://module1/securityhub-remediations-workshop.yml
-            --stack-name $STACKPREFIX
-            --capabilities CAPABILITY_NAMED_IAM
-            --parameters $STACKPARAMETERS
-            --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild &&
+          aws cloudformation $STACKACTION-stack --template-body file://module1/securityhub-remediations-workshop.yml \
+            --stack-name $STACKPREFIX \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameters $STACKPARAMETERS \
+            --tags Key=CostCenter,Value=SecurityHubRemediations-Codebuild && \
             aws cloudformation wait stack-$STACKACTION-complete --stack-name $STACKPREFIX
         fi
       - export CLIINSTANCE=$(aws ec2 describe-instances
@@ -38,7 +38,7 @@ phases:
       - |
         if expr "${CLIINSTANCE}" : "" >/dev/null;
         then
-          echo "Can't determine instance-id"
+          echo "Can't determine instance-id of cloud9 env"
           exit 1
         fi
       - |
