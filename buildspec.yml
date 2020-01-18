@@ -55,6 +55,7 @@ phases:
             --cloud-watch-output-config CloudWatchLogGroupName=$CWLGROUPNAME,CloudWatchOutputEnabled=true
             --parameters  commands=["$GITCMD &&
                                     $(aws ecr get-login --no-include-email --region $AWS_REGION) &&
+                                    docker pull ${SECHUBWORKSHOP_CONTAINER} &&
                                     docker run -i --rm --cap-drop ALL
                                     -v /home/ec2-user/environment/securityhub-remediations:/home/custodian/securityhub-remediations:ro -v /home/ec2-user/.aws:/home/custodian/.aws:ro
                                     --env AWS_STS_REGIONAL_ENDPOINTS
