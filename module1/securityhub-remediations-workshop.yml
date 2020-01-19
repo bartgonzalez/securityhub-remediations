@@ -226,6 +226,7 @@ Resources:
               - "guardduty:ArchiveFindings"
               - "cloudformation:ValidateTemplate"
               - "events:TestEventPattern"
+              - "cloudwatch:ListMetrics"
             Resource: "*"
     Metadata:
       cfn_nag:
@@ -258,7 +259,7 @@ Resources:
               - "lambda:PutFunctionConcurrency"
               - "lambda:DeleteFunctionConcurrency"
             Resource:
-              - !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:custodian-*'
+              - !Sub 'arn:${AWS::Partition}:lambda:*:${AWS::AccountId}:function:custodian-*'
           -
             Sid: "CCDeployLambdasAllResources"
             Effect: "Allow"
@@ -280,7 +281,7 @@ Resources:
               - "events:RemoveTargets"
               - "events:DeleteRule"
             Resource:
-              - !Sub 'arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/custodian-*'
+              - !Sub 'arn:${AWS::Partition}:events:*:${AWS::AccountId}:rule/custodian-*'
           -
             Sid: "PutConfigRules"
             Effect: "Allow"
