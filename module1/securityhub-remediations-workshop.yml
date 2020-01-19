@@ -215,8 +215,6 @@ Resources:
           -
             Effect: "Allow"
             Action:
-              - "ec2:StartInstances"
-              - "ec2:TerminateInstances"
               - "ec2:CreateVolume"
               - "ec2:ModifySnapshotAttribute"
               - "guardduty:CreateSampleFindings"
@@ -331,6 +329,7 @@ Resources:
               - "ec2:DisassociateIamInstanceProfile"
               - "ec2:AuthorizeSecurityGroupIngress"
               - "ec2:RevokeSecurityGroupIngress"
+              - "ec2:StartInstances"
               - "ec2:StopInstances"
               - "ec2:TerminateInstances"
               - "config:PutEvaluations"
