@@ -241,15 +241,12 @@ Resources:
         Version: "2012-10-17"
         Statement:
           -
-            Sid: "CCDeployLambdas"
+            Sid: "CCDeployLambdasResourceLimit"
             Effect: "Allow"
             Action:
               - "lambda:CreateFunction"
               - "lambda:InvokeFunction"
               - "lambda:UpdateFunctionConfiguration"
-              - "lambda:CreateEventSourceMapping"
-              - "lambda:UpdateEventSourceMapping"
-              - "lambda:DeleteEventSourceMapping"
               - "lambda:UpdateAlias"
               - "lambda:UpdateFunctionCode"
               - "lambda:AddPermission"
@@ -258,13 +255,22 @@ Resources:
               - "lambda:CreateAlias"
               - "lambda:DeleteAlias"
               - "lambda:GetFunction"
-              - "lambda:GetFunctionEventInvokeConfig"
               - "lambda:PutFunctionConcurrency"
               - "lambda:DeleteFunctionConcurrency"
-              - "lambda:TagResource"
-              - "lambda:UntagResource"
             Resource:
               - !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:custodian-*'
+          -
+            Sid: "CCDeployLambdasAllResources"
+            Effect: "Allow"
+            Action:
+              - "lambda:GetFunction"
+              - "lambda:GetFunctionEventInvokeConfig"
+              - "lambda:CreateEventSourceMapping"
+              - "lambda:UpdateEventSourceMapping"
+              - "lambda:DeleteEventSourceMapping"
+              - "lambda:TagResource"
+              - "lambda:UntagResource"
+            Resource: "*"
           -
             Sid: "Events"
             Effect: "Allow"
