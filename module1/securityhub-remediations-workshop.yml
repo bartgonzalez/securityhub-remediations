@@ -103,7 +103,6 @@ Metadata:
     config:
       ignore_checks:
       - E3002
-      - E3003
 
 Resources:
   WorkshopVpc:
@@ -786,4 +785,6 @@ Resources:
       IsLogging: true
       IsMultiRegionTrail: false
       Tags:
-        - CostCenter: !Ref "CostCenter"
+        -
+          Key: CostCenter
+          Value: !Ref "CostCenter"
