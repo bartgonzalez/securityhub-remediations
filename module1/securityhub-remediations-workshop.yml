@@ -219,6 +219,7 @@ Resources:
               - "ec2:CreateVolume"
               - "ec2:ModifySnapshotAttribute"
               - "ec2:AssociateIamInstanceProfile"
+              - "sts:DecodeAuthorizationMessage"
               - "securityhub:EnableSecurityHub"
               - "guardduty:CreateDetector"
               - "guardduty:CreateSampleFindings"
@@ -294,6 +295,7 @@ Resources:
               - "iam:PassRole"
             Resource:
               - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CloudCustodian'
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/SecurityHubRemediationWorkshopTestTarget'
     Metadata:
       cfn_nag:
         rules_to_suppress:

@@ -10,6 +10,6 @@
 3.  Review the CloudWatch Log to observe that actions listed in the policy were invoked, and you can verify by using the console to view that the instance doesn't have an IAM Profile associated anymore and that a Snapshot was taken.
 4.  Now run the following command to re-associate the InstanceProfile so the instance is ready for the next module.
 
-        aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopCli --instance-id $(aws ec2 describe-instances --filters "Name=tag:Name,Values=RemediationTestTarget" --query Reservations[*].Instances[*].[InstanceId] --output text)
+        aws ec2 associate-iam-instance-profile --iam-instance-profile Name=SecurityHubRemediationWorkshopTestTarget --instance-id $(aws ec2 describe-instances --filters "Name=tag:Name,Values=RemediationTestTarget" --query Reservations[*].Instances[*].[InstanceId] --output text)
 
 5.  Review module4/ec2-public-ingress.yml observing that the lack of a "mode" section, compared to the policy deployed earlier in the module, means it can be run anytime from a CLI to find the risky configuration without requiring a vulnerability event.
