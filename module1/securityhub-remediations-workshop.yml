@@ -772,7 +772,9 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       Tags:
-        - CostCenter: !Ref "CostCenter"
+        -
+          Key: CostCenter
+          Value: !Ref "CostCenter"
   AwsCloudTrail:
     Condition: EnableCloudTrail
     DependsOn:
