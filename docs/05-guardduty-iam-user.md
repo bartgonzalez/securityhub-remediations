@@ -1,7 +1,7 @@
 # Module 5 - Automated Remediations - GuardDuty Event on IAMUser
 1. Run the following command:
 
-        ${CLOUDCUSTODIANDOCKERCMD} /home/custodian/securityhub-remediations/module5/iam-user-hubfinding-remediate-disable.yml
+        ${CLOUDCUSTODIANDOCKERCMD} securityhub-remediations/module5/iam-user-hubfinding-remediate-disable.yml
 
 2.  Verify that the previous command resulted in output containing "Provisioning policy lambda iam-user-hubfinding-remediate-disable"
 3.  Optional, but at least read: Next archive any existing sample GuardDuty Findings for the IAM User named GeneratedFindingUserName.  While this is not nessesary when the create-sample-findings command (which is run later in this module) has never been run before, it won't harm anything to run.  And if it's not run and the sample finding has already been generated, then the cloudwatch event needed for this module to function never gets triggered, so we're running it to eliminate sources of potential error.  And if you want to rerun this module, you need to run this command.

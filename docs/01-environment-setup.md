@@ -35,13 +35,13 @@ To Get started with this workshop as part of the an AWS Event where Event Engine
 2.  Now click the "Open IDE" button.
 3.  In the bottom part of the browser tab which opens up, look for a tab with a label starting with "bash", where the window contents contain "~/environment $".  This is the browser based terminal session you'll use for the rest of the workshop for any command line steps.
 
-4.  Run the following command to enable SecurityHub in the account, unless you are using your own account and know that it's already enabled. If you have full unresticted Admin Access, and get an error, then the most likely reason is that it is already enabled.
-
-        aws securityhub enable-security-hub
-
-5.  You need to have GuardDuty enabled on the account for module 2 and 5 to work, if not yet then either run the following command or follow the [steps to enable on the console](https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_settingup.html#guardduty_enable-gd)
+4.  You need to have GuardDuty enabled on the account for module 2 and 5 to work, if not yet then either run the following command or follow the [steps to enable on the console](https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_settingup.html#guardduty_enable-gd)
 
         aws guardduty create-detector --enable
+
+5.  Run the following command to enable SecurityHub in the account, unless you are using your own account and know that it's already enabled. If you have full unresticted Admin Access, and get an error, then the most likely reason is that it is already enabled.
+
+        aws securityhub enable-security-hub
 
 6.  The next step is to get a copy of the files required for this workshop by cloning the workshop's github repo specifing the eventengine branch.
 

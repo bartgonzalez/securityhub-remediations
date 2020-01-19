@@ -225,6 +225,7 @@ Resources:
               - "guardduty:CreateSampleFindings"
               - "guardduty:ArchiveFindings"
               - "cloudformation:ValidateTemplate"
+              - "events:TestEventPattern"
             Resource: "*"
     Metadata:
       cfn_nag:
@@ -257,6 +258,7 @@ Resources:
               - "lambda:CreateAlias"
               - "lambda:DeleteAlias"
               - "lambda:GetFunction"
+              - "lambda:GetFunctionEventInvokeConfig"
               - "lambda:PutFunctionConcurrency"
               - "lambda:DeleteFunctionConcurrency"
               - "lambda:TagResource"
