@@ -29,6 +29,7 @@ The cloudformation in this workshop sets up the following:
 2. IAM policies, Role, and Instance-Profiles.
 3. An ec2 instance to be used as a test target.
 4. IAM user to demo ability to disable it's access keys.
+5. CloudWatch Log Groups
 
 As part of the Workshop, Security Hub and Guard Duty will be enabled.
 

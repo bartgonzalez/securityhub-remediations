@@ -72,7 +72,7 @@ Parameters:
     Description: 'Value to use for the CostCenter tag applied to taggable resources created by this Workshop'
   CreateLogGroups:
     Type: 'String'
-    Description: 'Boolen value which Defaults to True, controls in LogGroups are created in the Cloudformation which simplifies cleanup'
+    Description: 'Boolean value which Defaults to True, controls in LogGroups are created in the Cloudformation which simplifies cleanup'
     AllowedValues:
       - "False"
       - "True"
@@ -81,7 +81,13 @@ Parameters:
     Type: 'Number'
     Description: 'Number of days to retain log streams in the Cloudwatch LogGroups'
     Default: 30
-
+  EnableCloudTrail:
+    Type: 'String'
+    Description: 'Boolean value which Defaults to True, controls if Cloudtrail gets enabled'
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "True"
 Conditions:
   CreateCloud9Instance: !Equals [!Ref CreateCloud9Instance, "True"]
   EventEngine: !Equals [!Ref EventEngine, "True"]
@@ -91,7 +97,7 @@ Conditions:
   EnableSecurityHub: !Equals [!Ref EnableSecurityHub, "True"]
   CreateCloudCustodianMemberRole: !Equals [!Ref CreateCloudCustodianMemberRole, "True"]
   CreateLogGroups: !Equals [!Ref CreateLogGroups, "True"]
-
+  EnableCloudTrail: !Equals [!Ref EnableCloudTrail, "True"]
 Metadata:
   cfn-lint:
     config:
@@ -731,3 +737,50 @@ Resources:
     Properties:
       LogGroupName: /aws/lambda/custodian-post-ebs-snapshot-public-passing
       RetentionInDays: !Ref "RetentionDays"
+  AWSCloudTrailBucketPolicy:
+    Condition: EnableCloudTrail
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AWSCloudTrailBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Sid: AWSCloudTrailAclCheck
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudtrail.amazonaws.com
+            Action: s3:GetBucketAcl
+            Resource: !GetAtt AWSCloudTrailBucket.Arn
+          -
+            Sid: AWSCloudTrailWrite
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudtrail.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Join [ '', [ !GetAtt AWSCloudTrailBucket.Arn, '/AWSLogs/', !Ref 'AWS::AccountId', '/*' ] ]
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: bucket-owner-full-control
+  AWSCloudTrailBucket:
+    Condition: EnableCloudTrail
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Tags:
+        CostCenter: !Ref "CostCenter"
+  AwsCloudTrail:
+    Condition: EnableCloudTrail
+    DependsOn:
+      - AWSCloudTrailBucketPolicy
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      S3BucketName: !Ref AWSCloudTrailBucket
+      IncludeGlobalServiceEvents: true
+      IsLogging: true
+      IsMultiRegionTrail: false
+      Tags:
+        CostCenter: !Ref "CostCenter"

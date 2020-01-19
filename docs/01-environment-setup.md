@@ -24,6 +24,7 @@ To Get started with this workshop as part of the an AWS Event where Event Engine
 8. Enter in a Stack name, for example "SecurityHubRemediations".
 9. Change the value of "EventEngine" to False.
 9. Change the value of VpcId to "CreateNew", unless you have a good reason to want to use an existing VPC and if so, enter the VpcId instead
+10. Change the value of EnableCloudtrail to False, unless you don't already have it enabled.
 9. Click the "Next" button.
 9. On the "Configure stack options" page, Click the "Next" button.
 9. On the "Review" page, click the checkbox to the left of "I acknowledge that AWS Cloudformation might create IAM resources with custom names", as it will.
