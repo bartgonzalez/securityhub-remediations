@@ -64,7 +64,7 @@ To Get started with this workshop as part of the an AWS Event where Event Engine
 
 Here is a breakdown of the command you just ran:
 
-| Command Line Component | Explaination |
+| Command Line Component | Description |
 | --------- | ------------ |
 | docker run | [Run](https://docs.docker.com/engine/reference/run/) a [docker](https://docs.docker.com/engine/reference/commandline/cli/) container |
 | -it | [interactive/foreground mode](https://docs.docker.com/engine/reference/run/#foreground) |
