@@ -218,6 +218,7 @@ Resources:
             Action:
               - "ec2:CreateVolume"
               - "ec2:ModifySnapshotAttribute"
+              - "ec2:AssociateIamInstanceProfile"
               - "securityhub:EnableSecurityHub"
               - "guardduty:CreateDetector"
               - "guardduty:CreateSampleFindings"
