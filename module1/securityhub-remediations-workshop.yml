@@ -217,15 +217,10 @@ Resources:
             Action:
               - "ec2:StartInstances"
               - "ec2:TerminateInstances"
-              - "ec2:Describe*"
+              - "ec2:CreateVolume"
+              - "ec2:ModifySnapshotAttribute"
               - "guardduty:CreateSampleFindings"
               - "guardduty:ArchiveFindings"
-              - "ssm:SendCommand"
-              - "lambda:ListFunctions"
-              - "ec2:CreateVolume"
-              - "ec2:*Snapshot"
-              - "ec2:ModifySnapshotAttribute"
-              - "logs:GetLogEvents"
               - "cloudformation:ValidateTemplate"
             Resource: "*"
     Metadata:
