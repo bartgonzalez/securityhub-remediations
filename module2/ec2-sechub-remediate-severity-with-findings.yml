@@ -6,8 +6,7 @@ policies:
         type: hub-finding
         role: arn:aws:iam::{account_id}:role/CloudCustodian
         member-role: arn:aws:iam::{account_id}:role/CloudCustodianMember
-        memory: 128
-        packages: [botocore, boto3]
+        memory: 256
         concurrency: 1
         tags:
           CostCenter: SecurityHubWorkshop
