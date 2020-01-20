@@ -130,3 +130,5 @@ This module will show how to setup an automated detection of a EBS Snaspshot tha
 28. And just like filters, the attributes for a given action can be viewed by running the schema command specifing the <resource_type>.actions.<action_name>, like the following:
 
         docker run -it --rm ${SECHUBWORKSHOP_CONTAINER} schema ebs-snapshot.actions.post-finding
+
+29. You have completed this module.  If you are using an account provided by an AWS Event via EventEngine, then you have completed the Workshop and do not need to proceed with Module 7.  If you are using your own account, then proceeding to module 7 is advised to cleanup resources created during the Workshop.

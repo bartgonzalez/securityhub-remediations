@@ -34,3 +34,5 @@ However, if you used your own account, then follow these steps to cleanup your a
 	* Click on **Settings** on the left navigation.
 	* Click the **General** on the top navigation.
 	* Click **Disable AWS Security Hub**.
+
+6. You have completed both this module and the Workshop.  Congrats!
