@@ -10,7 +10,7 @@ Your feedback is highly desired, please [submit a new issue](https://github.com/
 * **Level**: Intermediate
 * **Duration**: 1 - 2 hours
 * **[CSF Functions:](https://www.nist.gov/cyberframework/online-learning/five-functions)** Detect, Respond
-* **[CAF Components:](https://d0.awsstatic.com/whitepapers/AWS_CAF_Security_Perspective.pdf")** Detective, Responsive
+* **[CAF Components:](https://d0.awsstatic.com/whitepapers/AWS_CAF_Security_Perspective.pdf)** Detective, Responsive
 * **[Prerequisites:](https://awssecworkshops.com/getting-started/)** AWS Account with an Admin IAM user/role with [AWS CLI](https://aws.amazon.com/cli/) configured. If you are doing this Workshop as part of an AWS Event where Event Engine is being used, these will be supplied.
 
 # Scenario
